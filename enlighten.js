@@ -14,9 +14,11 @@
     
     this.headerElement = _isString(argv.headerElement) ? argv.headerElement : 'h2';
 
-    this.closeBtn    = _isBoolean(argv.closeBtn)   ? argv.closeBtn   : true;
-    this.confirmBtn  = _isBoolean(argv.confirmBtn) ? argv.confirmBtn : false;
-    this.cancelBtn   = _isBoolean(argv.cancelBtn)  ? argv.cancelBtn  : false;
+    this.closeBtn       = _isBoolean(argv.closeBtn)      ? argv.closeBtn       : true;
+    this.confirmBtn     = _isBoolean(argv.confirmBtn)    ? argv.confirmBtn     : false;
+    this.cancelBtn      = _isBoolean(argv.cancelBtn)     ? argv.cancelBtn      : false;
+    this.confirmBtnText = _isString(argv.confirmBtnText) ? argv.confirmBtnText : 'Confirm';
+    this.cancelBtnText  = _isString(argv.cancelBtnText)  ? argv.cancelBtnText  : 'Cancel';
     
     this.allowOutsideClick = _isBoolean(argv.allowOutsideClick) ? argv.allowOutsideClick : true;
     this.allowEscapeKey    = _isBoolean(argv.allowEscapeKey)    ? argv.allowEscapeKey    : true;
@@ -97,7 +99,7 @@
     _enlightenBox.children.push(_enlightenHeader);
 
     if (this.closeBtn) {
-      var _enlightenCloseButton = {
+      var _enlightenCloseBtn = {
         element: 'a',
         className: 'enlighten enlighten-close-btn',
         attributes: {
@@ -122,7 +124,7 @@
         },
         children: ['&times']
       }
-      _enlightenHeader.children.push(_enlightenCloseButton);
+      _enlightenHeader.children.push(_enlightenCloseBtn);
     }
     
     var _enlightenTitle = {
@@ -151,9 +153,57 @@
       var _enlightenFooter = {
         element: 'div',
         className: 'enlighten enlighten-footer',
+        attributes: {
+          style: _cssJSONStringify({
+            padding: '0 20px 10px 20px',
+            textAlign: 'center'
+          })
+        },
         children: []
       };
       _enlightenBox.children.push(_enlightenFooter);
+
+      if (this.confirmBtn) {
+        var _enlightenConfirmBtn = {
+          element: 'button',
+          className: 'enlighten enlighten-confirm-btn',
+          attributes: {
+            style: _cssJSONStringify({
+              backgroundColor: 'hsl(120, 100%, 50%)',
+              color: 'white',
+              border: 'none',
+              borderBottom: '5px solid hsl(120, 100%, 40%)',
+              borderRadius: '3px',
+              margin: '5px 10px',
+              padding: '10px 20px',
+              fontSize: '12pt'
+            })
+          },
+          children: [this.confirmBtnText]
+        };
+        _enlightenFooter.children.push(_enlightenConfirmBtn);
+      }
+
+      if (this.cancelBtn) {
+        var _enlightenCancelBtn = {
+          element: 'button',
+          className: 'enlighten enlighten-cancel-btn',
+          attributes: {
+            style: _cssJSONStringify({
+              backgroundColor: 'hsl(360, 100%, 50%)',
+              color: 'white',
+              border: 'none',
+              borderBottom: '5px solid hsl(360, 100%, 40%)',
+              borderRadius: '3px',
+              margin: '5px 10px',
+              padding: '10px 20px',
+              fontSize: '12pt'
+            })
+          },
+          children: [this.cancelBtnText]
+        };
+        _enlightenFooter.children.push(_enlightenCancelBtn);
+      }
     }
 
     /* Render Root unless The Enlighten Box Binded to DOM Element */
