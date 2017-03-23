@@ -6,15 +6,21 @@
     if (!_isObject(argv)) { console.error('Show pass in "object" type value!'); return; }
 
     /* Arguments & Settings */
+    this.bindAt    = _isString(argv.bindAt)    ? argv.bindAt    : undefined;
+    this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click'; 
+
     this.title   = _isString(argv.title)   ? argv.title   : undefined;
     this.content = _isString(argv.content) ? argv.content : undefined;
     this.html    = _isString(argv.html)    ? argv.html    : undefined;
     
     this.headerElement = _isString(argv.headerElement) ? argv.headerElement : 'h2';
 
-    this.showCloseButton   = _isBoolean(argv.showCloseButton)   ? argv.showCloseButton   : true;
-    this.showConfirmButton = _isBoolean(argv.showConfirmButton) ? argv.showConfirmButton : true;
-    this.showCancelButton  = _isBoolean(argv.showCancelButton)  ? argv.showCancelButton  : false;
+    this.closeBtn    = _isBoolean(argv.closeBtn)   ? argv.closeBtn   : true;
+    this.confirmBtn  = _isBoolean(argv.confirmBtn) ? argv.confirmBtn : false;
+    this.cancelBtn   = _isBoolean(argv.cancelBtn)  ? argv.cancelBtn  : false;
+    
+    this.allowOutsideClick = _isBoolean(argv.allowOutsideClick) ? argv.allowOutsideClick : true;
+    this.allowEscapeKey    = _isBoolean(argv.allowEscapeKey)    ? argv.allowEscapeKey    : true;
 
     this.style = {
       width:             _isNumber(argv.width)             ? argv.width             : 500,
@@ -27,9 +33,11 @@
     };
 
     this.ID = _randomString(10);
+    this.enlighten = true;
     
     /* Input Validation */
-    if (this.title === undefined) { console.error('"title" property is required!'); return; }
+    if (this.bindAt && document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); }
+    if (this.title  === undefined) { console.error('"title" property is required!');  return; }
     
     /*
      *  Enlighten Component Schema
@@ -89,33 +97,35 @@
     };
     _enlightenBox.children.push(_enlightenHeader);
 
-    var _enlightenCloseButton = {
-      element: 'a',
-      className: 'enlighten enlighten-close-btn',
-      attributes: {
-        id: 'enlighten-close-btn-' + this.ID,
-        href: '#',
-        style: _cssJSONStringify({
-          display: 'block',
-          width: '20px',
-          height: '20px',
-          fontSize: '20px',
-          lineHeight: '20px',
-          textAlign: 'center',
-          textDecoration: 'none',
-          color: 'white',
-          backgroundColor: '#333',
-          padding: '5px',
-          borderRadius: '50%',
-          position: 'absolute',
-          top: '-' + this.style.borderRadius + 'px',
-          right: '-' + this.style.borderRadius + 'px'
-        })
-      },
-      children: ['&times']
+    if (this.closeBtn) {
+      var _enlightenCloseButton = {
+        element: 'a',
+        className: 'enlighten enlighten-close-btn',
+        attributes: {
+          id: 'enlighten-close-btn-' + this.ID,
+          href: '#',
+          style: _cssJSONStringify({
+            display: 'block',
+            width: '20px',
+            height: '20px',
+            fontSize: '20px',
+            lineHeight: '20px',
+            textAlign: 'center',
+            textDecoration: 'none',
+            color: 'white',
+            backgroundColor: '#333',
+            padding: '5px',
+            borderRadius: '50%',
+            position: 'absolute',
+            top: '-' + this.style.borderRadius + 'px',
+            right: '-' + this.style.borderRadius + 'px'
+          })
+        },
+        children: ['&times']
+      }
+      _enlightenHeader.children.push(_enlightenCloseButton);
     }
-    _enlightenHeader.children.push(_enlightenCloseButton);
-
+    
     var _enlightenTitle = {
       element: this.headerElement,
       className: 'enlighten enlighten-title',
@@ -129,33 +139,74 @@
     };
     _enlightenHeader.children.push(_enlightenTitle);
 
-    var _enlightenBody = {
-      element: 'div',
-      className: 'enlighten enlighten-body',
-      children: []
-    };
-    _enlightenBox.children.push(_enlightenBody);
+    if (this.content || this.html) {
+      var _enlightenBody = {
+        element: 'div',
+        className: 'enlighten enlighten-body',
+        children: []
+      };
+      _enlightenBox.children.push(_enlightenBody);
+    }
+    
+    if (this.confirmBtn || this.cancelBtn) {
+      var _enlightenFooter = {
+        element: 'div',
+        className: 'enlighten enlighten-footer',
+        children: []
+      };
+      _enlightenBox.children.push(_enlightenFooter);
+    }
 
-    var _enlightenFooter = {
-      element: 'div',
-      className: 'enlighten enlighten-footer',
-      children: []
-    };
-    _enlightenBox.children.push(_enlightenFooter);
+    /* Render Root unless The Enlighten Box Binded to DOM Element */
+    if (!this.bindAt) {
+      document.body.appendChild(_jsonToHTML(_enlightenRoot));
+    } else this.enlighten = false;
 
-    /* Render Root */
-    document.body.appendChild(_jsonToHTML(_enlightenRoot));
+    /*-------------------------------------- Events Setting -------------------------------------------*/
 
     /* Event Settings */
-    
-    /* Close Button Event */
+    var $bindedElement = document.getElementById(this.bindAt);
     var $rootElement = document.getElementById('enlighten-root-' + this.ID);
     var $closeButtonElement = document.getElementById('enlighten-close-btn-' + this.ID);
-    $closeButtonElement.addEventListener('click', function(event) {
-      event.preventDefault();
-      /* Pull out the enlighten root */
-      $rootElement.parentNode.removeChild($rootElement);
-    });
+
+    /* Binded Element Event */
+    if (this.bindAt && $bindedElement) {
+      $bindedElement.addEventListener('click', function(event) {
+        event.preventDefault();
+        this.enlighten = true;
+        document.body.appendChild(_jsonToHTML(_enlightenRoot));  
+      });
+    }
+
+    /* Close Button Event */
+    if ($closeButtonElement && this.closeBtn) {
+      $closeButtonElement.addEventListener('click', function(event) {
+        event.preventDefault();
+        _removeNode($rootElement);
+        this.enlighten = false;
+      }.bind(this));
+    }
+
+    /* Close Enlighten Box Outside */
+    if ($rootElement && this.allowOutsideClick) {
+      $rootElement.addEventListener('click', function(event) {
+        if (event.target.id === $rootElement.id && this.enlighten) {
+          _removeNode($rootElement);
+          this.enlighten = false;
+        }
+      }.bind(this));
+    }
+    
+    /* Close Enlighten Box via Escape Key */
+    if (this.allowEscapeKey) {
+      document.body.addEventListener('keyup', function(event) {
+        if (event.key === 'Escape' && $rootElement && this.enlighten) {
+          _removeNode($rootElement);
+          this.enlighten = false;
+        }
+      }.bind(this));
+    }
+
   }
 
   function _isString(variable)   { return typeof variable === 'string';   }
@@ -225,5 +276,7 @@
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
   }
+
+  function _removeNode(node) { if (node && node instanceof Node) node.parentElement.removeChild(node); }
 
 })();
