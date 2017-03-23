@@ -7,8 +7,7 @@
 
     /* Arguments & Settings */
     this.bindAt    = _isString(argv.bindAt)    ? argv.bindAt    : undefined;
-    this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click'; 
-
+    this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click';
     this.title   = _isString(argv.title)   ? argv.title   : undefined;
     this.content = _isString(argv.content) ? argv.content : undefined;
     this.html    = _isString(argv.html)    ? argv.html    : undefined;
@@ -36,7 +35,7 @@
     this.enlighten = true;
     
     /* Input Validation */
-    if (this.bindAt && document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); }
+    if (this.bindAt && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); }
     if (this.title  === undefined) { console.error('"title" property is required!');  return; }
     
     /*
@@ -164,49 +163,55 @@
 
     /*-------------------------------------- Events Setting -------------------------------------------*/
 
-    /* Event Settings */
+    /* Binded Mode */
     var $bindedElement = document.getElementById(this.bindAt);
-    var $rootElement = document.getElementById('enlighten-root-' + this.ID);
-    var $closeButtonElement = document.getElementById('enlighten-close-btn-' + this.ID);
-
-    /* Binded Element Event */
     if (this.bindAt && $bindedElement) {
-      $bindedElement.addEventListener('click', function(event) {
+      var _bindedElementEvent = function(event) {
         event.preventDefault();
         this.enlighten = true;
-        document.body.appendChild(_jsonToHTML(_enlightenRoot));  
-      });
+        document.body.appendChild(_jsonToHTML(_enlightenRoot));
+        _setupEvents();
+      };
+      $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
     }
 
-    /* Close Button Event */
-    if ($closeButtonElement && this.closeBtn) {
-      $closeButtonElement.addEventListener('click', function(event) {
-        event.preventDefault();
-        _removeNode($rootElement);
-        this.enlighten = false;
-      }.bind(this));
-    }
+    var _setupEvents = function() {
+      var $rootElement = document.getElementById('enlighten-root-' + this.ID);
+      var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
 
-    /* Close Enlighten Box Outside */
-    if ($rootElement && this.allowOutsideClick) {
-      $rootElement.addEventListener('click', function(event) {
-        if (event.target.id === $rootElement.id && this.enlighten) {
+      /* Close Button Event */
+      if ($closeBtnElement && this.closeBtn) {
+        var _closeBtnEvent = function(event) {
+          event.preventDefault();
           _removeNode($rootElement);
           this.enlighten = false;
-        }
-      }.bind(this));
-    }
-    
-    /* Close Enlighten Box via Escape Key */
-    if (this.allowEscapeKey) {
-      document.body.addEventListener('keyup', function(event) {
-        if (event.key === 'Escape' && $rootElement && this.enlighten) {
-          _removeNode($rootElement);
-          this.enlighten = false;
-        }
-      }.bind(this));
-    }
+        };
+        $closeBtnElement.addEventListener('click', _closeBtnEvent.bind(this));
+      }
 
+      /* Close Enlighten Box Outside */
+      if ($rootElement && this.allowOutsideClick) {
+        var _allowOutsideClickEvent = function(event) {
+          if (event.target.id === $rootElement.id && this.enlighten) {
+            _removeNode($rootElement);
+            this.enlighten = false;
+          }
+        };
+        $rootElement.addEventListener('click', _allowOutsideClickEvent.bind(this));
+      }
+      
+      /* Close Enlighten Box via Escape Key */
+      if (this.allowEscapeKey) {
+        var _allowEscapeKeyEvent = function(event) {
+          if (event.key === 'Escape' && $rootElement && this.enlighten) {
+            _removeNode($rootElement);
+            this.enlighten = false;
+          }
+        };
+        document.body.addEventListener('keyup', _allowEscapeKeyEvent.bind(this));
+      }
+    }.bind(this);
+    if (!this.bindAt) { _setupEvents(); }
   }
 
   function _isString(variable)   { return typeof variable === 'string';   }
