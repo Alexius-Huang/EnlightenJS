@@ -20,7 +20,14 @@
       Enlighten({
         title: 'Hello World!',
         confirmBtn: true,
+        //promise: new Promise(function(resolve, reject) {
+        //  resolve(123);
+        //})
         cancelBtn: true
+      }).then(function(value) {
+        console.log(value)
+      }).catch(function(value) {
+        console.log(value);
       });
     })
   </script>

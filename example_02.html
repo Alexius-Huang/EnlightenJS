@@ -17,7 +17,15 @@
   <script>
     Enlighten({
       bindAt: 'app',
-      title: 'Hello World!'
+      title: 'Hello World!',
+      confirmBtn: true,
+      cancelBtn: true,
+      confirmed: function() {
+        console.log('hello')
+      },
+      cancelled: function() {
+        console.log('cancelled')
+      }
     });
   </script>
 </body>

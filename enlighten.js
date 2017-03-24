@@ -2,7 +2,6 @@
   
   /* Define Constructor */
   this.Enlighten = function(argv) {
-
     if (!_isObject(argv)) { console.error('Show pass in "object" type value!'); return; }
 
     /* Arguments & Settings */
@@ -13,15 +12,20 @@
     this.html    = _isString(argv.html)    ? argv.html    : undefined;
     
     this.headerElement = _isString(argv.headerElement) ? argv.headerElement : 'h2';
-
-    this.closeBtn       = _isBoolean(argv.closeBtn)      ? argv.closeBtn       : true;
-    this.confirmBtn     = _isBoolean(argv.confirmBtn)    ? argv.confirmBtn     : false;
-    this.cancelBtn      = _isBoolean(argv.cancelBtn)     ? argv.cancelBtn      : false;
-    this.confirmBtnText = _isString(argv.confirmBtnText) ? argv.confirmBtnText : 'Confirm';
-    this.cancelBtnText  = _isString(argv.cancelBtnText)  ? argv.cancelBtnText  : 'Cancel';
     
+    this.closeBtn       = _isBoolean(argv.closeBtn)       ? argv.closeBtn       : true;
+    this.confirmBtn     = _isBoolean(argv.confirmBtn)     ? argv.confirmBtn     : false;
+    this.cancelBtn      = _isBoolean(argv.cancelBtn)      ? argv.cancelBtn      : false;
+    this.confirmBtnText = _isString(argv.confirmBtnText)  ? argv.confirmBtnText : 'Confirm';
+    this.cancelBtnText  = _isString(argv.cancelBtnText)   ? argv.cancelBtnText  : 'Cancel';
+    this.confirmed      = _isFunction(argv.confirmed)     ? argv.confirmed      : false;
+    this.cancelled      = _isFunction(argv.cancelled)     ? argv.cancelled      : false;
+
     this.allowOutsideClick = _isBoolean(argv.allowOutsideClick) ? argv.allowOutsideClick : true;
     this.allowEscapeKey    = _isBoolean(argv.allowEscapeKey)    ? argv.allowEscapeKey    : true;
+
+    /* Disable it will disable all the pseudo css class style */
+    this.enableStyleElement = _isBoolean(argv.enableStyleElement) ? argv.enableStyleElement : true;
 
     this.style = {
       width:             _isNumber(argv.width)             ? argv.width             : 500,
@@ -35,9 +39,10 @@
 
     this.ID = _randomString(10);
     this.enlighten = true;
+    this.mode = this.bindAt ? 'bind' : 'call';
     
     /* Input Validation */
-    if (this.bindAt && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); }
+    if (this.mode === 'bind' && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); return; }
     if (this.title  === undefined) { console.error('"title" property is required!');  return; }
     
     /*
@@ -46,10 +51,12 @@
      *  - Root
      *    - Box
      *      - Header
-     *        - CloseButton
+     *        - CloseBtn
      *        - Title
      *      - Body
      *      - Footer
+     *        - ConfirmBtn
+     *        - CancelBtn
      */
     
     var _enlightenRoot = {
@@ -58,6 +65,7 @@
       attributes: {
         id: 'enlighten-root-' + this.ID,
         style: _cssJSONStringify({
+          display: this.mode === 'bind' ? 'none' : 'block',
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           width: '100%',
           height: '100%',
@@ -168,6 +176,7 @@
           element: 'button',
           className: 'enlighten enlighten-confirm-btn',
           attributes: {
+            id: 'enlighten-confirm-btn-' + this.ID,
             style: _cssJSONStringify({
               backgroundColor: 'hsl(120, 100%, 50%)',
               color: 'white',
@@ -189,6 +198,7 @@
           element: 'button',
           className: 'enlighten enlighten-cancel-btn',
           attributes: {
+            id: 'enlighten-cancel-btn-' + this.ID,
             style: _cssJSONStringify({
               backgroundColor: 'hsl(360, 100%, 50%)',
               color: 'white',
@@ -207,28 +217,18 @@
     }
 
     /* Render Root unless The Enlighten Box Binded to DOM Element */
-    if (!this.bindAt) {
-      document.body.appendChild(_jsonToHTML(_enlightenRoot));
-    } else this.enlighten = false;
+    document.body.appendChild(_jsonToHTML(_enlightenRoot));
+    if (this.mode === 'bind') this.enlighten = false;
 
     /*-------------------------------------- Events Setting -------------------------------------------*/
 
-    /* Binded Mode */
+    var $rootElement = document.getElementById('enlighten-root-' + this.ID);
+    var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
+    var $confirmBtnElement = document.getElementById('enlighten-confirm-btn-' + this.ID);
+    var $cancelBtnElement = document.getElementById('enlighten-cancel-btn-' + this.ID);
     var $bindedElement = document.getElementById(this.bindAt);
-    if (this.bindAt && $bindedElement) {
-      var _bindedElementEvent = function(event) {
-        event.preventDefault();
-        this.enlighten = true;
-        document.body.appendChild(_jsonToHTML(_enlightenRoot));
-        _setupEvents();
-      };
-      $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
-    }
 
-    var _setupEvents = function() {
-      var $rootElement = document.getElementById('enlighten-root-' + this.ID);
-      var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
-
+    var _setupEvents = function() {  
       /* Close Button Event */
       if ($closeBtnElement && this.closeBtn) {
         var _closeBtnEvent = function(event) {
@@ -261,8 +261,76 @@
         document.body.addEventListener('keyup', _allowEscapeKeyEvent.bind(this));
       }
     }.bind(this);
-    if (!this.bindAt) { _setupEvents(); }
+
+    /* Binded Mode */
+    if (this.mode === 'bind' && $bindedElement) {
+      _setupEvents();
+      var _bindedElementEvent = function(event) {
+        event.preventDefault();
+        this.enlighten = true;
+        $rootElement.style.display = 'block';
+      };
+      $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
+
+      /* Confirm Button on Click Event */
+      if (this.confirmBtn) {
+        var _confirmBtnOnClickEvent = function(event) {
+          event.preventDefault();
+          if (this.enlighten) {
+            $rootElement.style.display = 'none';
+            this.enlighten = false;
+            if (this.confirmed) {
+              this.confirmed.call();
+            } else console.warn('"confirmed" property didn\'t setup properly');
+          }
+        }
+        $confirmBtnElement.addEventListener('click', _confirmBtnOnClickEvent.bind(this));
+      }
+      
+      /* Cancel Button on Click Event */
+      if (this.cancelBtn) {
+        var _cancelBtnOnClickEvent = function(event) {
+          event.preventDefault();
+          if (this.enlighten) {
+            $rootElement.style.display = 'none';
+            this.enlighten = false;
+            if (this.cancelled) {
+              this.cancelled.call();
+            } else console.warn('"cancelled" property didn\'t setup properly')
+          }
+        }
+        $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
+      }
+    }
+
+    /* Return Promise object when confirm or cancel button triggered in calling mode */
+    if (this.mode === 'call' && (this.confirmBtn || this.cancelBtn)) {
+      return new Promise(function(resolve, reject) {
+        /* Confirm Button on Click Event */
+        if (this.confirmBtn && this.enlighten) {
+          var _confirmBtnOnClickEvent = function(event) {
+            event.preventDefault();
+            _removeNode($rootElement);
+            resolve('confirmed');
+          }
+          $confirmBtnElement.addEventListener('click', _confirmBtnOnClickEvent.bind(this));
+        }
+        
+        /* Cancel Button on Click Event */
+        if (this.cancelBtn && this.enlighten) {
+          var _cancelBtnOnClickEvent = function(event) {
+            event.preventDefault();
+            _removeNode($rootElement);
+            reject('rejected');
+          }
+          $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
+        }
+      }.bind(this));
+    }
+  
   }
+
+  /*--------------------------- Helper Functions ----------------------------*/
 
   function _isString(variable)   { return typeof variable === 'string';   }
   function _isNumber(variable)   { return typeof variable === 'number';   }
