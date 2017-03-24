@@ -7,12 +7,18 @@
     /* Arguments & Settings */
     this.bindAt    = _isString(argv.bindAt)    ? argv.bindAt    : undefined;
     this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click';
-    this.title   = _isString(argv.title)   ? argv.title   : undefined;
-    this.content = _isString(argv.content) ? argv.content : undefined;
-    this.html    = _isString(argv.html)    ? argv.html    : undefined;
     
-    this.headerElement = _isString(argv.headerElement) ? argv.headerElement : 'h2';
+    // Header Part
+    this.title     = _isString(argv.title)     ? argv.title     : undefined;
+    this.header    = _isString(argv.header)    ? argv.header    : 'h2';
+
+    // Body Part
+    this.content   = _isString(argv.content)   ? argv.content   : undefined;
+    this.html      = _isString(argv.html)      ? argv.html      : undefined;
+    this.imageURL  = _isString(argv.imageURL)  ? argv.imageURL  : undefined;
+    this.imageSize = _isString(argv.imageSize) ? argv.imageSize : '300x300';
     
+    // Footer Part
     this.closeBtn       = _isBoolean(argv.closeBtn)       ? argv.closeBtn       : true;
     this.confirmBtn     = _isBoolean(argv.confirmBtn)     ? argv.confirmBtn     : false;
     this.cancelBtn      = _isBoolean(argv.cancelBtn)      ? argv.cancelBtn      : false;
@@ -30,9 +36,12 @@
     this.style = {
       width:             _isNumber(argv.width)             ? argv.width             : 500,
       height:            _isNumber(argv.height)            ? argv.height            : 300,
-      backgroundColor:   _isString(argv.backgroundColor)   ? argv.backgroundColor   : '#eee',
-      borderRadius:      _isNumber(argv.borderRadius)      ? argv.borderRadius      : 10,
       padding:           _isNumber(argv.padding) || _isArray(argv.padding) ? argv.padding : [5, 20],
+      headerFont:        _isString(argv.headerFont)        ? argv.headerFont        : null,
+      contentFont:       _isString(argv.contentFont)       ? argv.contentFont       : null,
+      contentAlign:      _isString(argv.contentAlign)      ? argv.contentAlign      : 'center',
+      borderRadius:      _isNumber(argv.borderRadius)      ? argv.borderRadius      : 10,
+      backgroundColor:   _isString(argv.backgroundColor)   ? argv.backgroundColor   : '#eee',
       animationType:     _isString(argv.animationType)     ? argv.animationType     : 'bounceIn',
       animationDuration: _isNumber(argv.animationDuration) ? argv.animationDuration : 0.5
     };
@@ -66,12 +75,6 @@
         id: 'enlighten-root-' + this.ID,
         style: _cssJSONStringify({
           display: this.mode === 'bind' ? 'none' : 'block',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          width: '100%',
-          height: '100%',
-          position: 'fixed',
-          left: '0',
-          top: '0',
           animation: { type: 'fadeIn', duration: 0.3 }
         })
       },
@@ -83,13 +86,9 @@
       className: 'enlighten enlighten-box',
       attributes: {
         style: _cssJSONStringify({
-          boxSizing: 'border-box',
           width: this.style.width + 'px',
           borderRadius: this.style.borderRadius + 'px',
           backgroundColor: this.style.backgroundColor,
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
           marginTop: '-' + (this.style.height / 2) + 'px',
           marginLeft: '-' + (this.style.width / 2) + 'px',
           animation: { type: this.style.animationType, duration: this.style.animationDuration }
@@ -114,18 +113,6 @@
           id: 'enlighten-close-btn-' + this.ID,
           href: '#',
           style: _cssJSONStringify({
-            display: 'block',
-            width: '20px',
-            height: '20px',
-            fontSize: '20px',
-            lineHeight: '20px',
-            textAlign: 'center',
-            textDecoration: 'none',
-            color: 'white',
-            backgroundColor: '#333',
-            padding: '5px',
-            borderRadius: '50%',
-            position: 'absolute',
             top: '-' + this.style.borderRadius + 'px',
             right: '-' + this.style.borderRadius + 'px'
           })
@@ -136,7 +123,7 @@
     }
     
     var _enlightenTitle = {
-      element: this.headerElement,
+      element: this.header,
       className: 'enlighten enlighten-title',
       attributes: {
         style: _cssJSONStringify({
@@ -161,12 +148,6 @@
       var _enlightenFooter = {
         element: 'div',
         className: 'enlighten enlighten-footer',
-        attributes: {
-          style: _cssJSONStringify({
-            padding: '0 20px 10px 20px',
-            textAlign: 'center'
-          })
-        },
         children: []
       };
       _enlightenBox.children.push(_enlightenFooter);
@@ -177,16 +158,6 @@
           className: 'enlighten enlighten-confirm-btn',
           attributes: {
             id: 'enlighten-confirm-btn-' + this.ID,
-            style: _cssJSONStringify({
-              backgroundColor: 'hsl(120, 100%, 50%)',
-              color: 'white',
-              border: 'none',
-              borderBottom: '5px solid hsl(120, 100%, 40%)',
-              borderRadius: '3px',
-              margin: '5px 10px',
-              padding: '10px 20px',
-              fontSize: '12pt'
-            })
           },
           children: [this.confirmBtnText]
         };
@@ -198,29 +169,22 @@
           element: 'button',
           className: 'enlighten enlighten-cancel-btn',
           attributes: {
-            id: 'enlighten-cancel-btn-' + this.ID,
-            style: _cssJSONStringify({
-              backgroundColor: 'hsl(360, 100%, 50%)',
-              color: 'white',
-              border: 'none',
-              borderBottom: '5px solid hsl(360, 100%, 40%)',
-              borderRadius: '3px',
-              margin: '5px 10px',
-              padding: '10px 20px',
-              fontSize: '12pt'
-            })
+            id: 'enlighten-cancel-btn-' + this.ID
           },
           children: [this.cancelBtnText]
         };
         _enlightenFooter.children.push(_enlightenCancelBtn);
       }
+
+      _enlightenFooter.children.push({
+        element: 'div',
+        className: 'enlighten-clear'
+      });
     }
 
     /* Render Root unless The Enlighten Box Binded to DOM Element */
     document.body.appendChild(_jsonToHTML(_enlightenRoot));
     if (this.mode === 'bind') this.enlighten = false;
-
-    /*-------------------------------------- Events Setting -------------------------------------------*/
 
     var $rootElement = document.getElementById('enlighten-root-' + this.ID);
     var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
@@ -228,12 +192,28 @@
     var $cancelBtnElement = document.getElementById('enlighten-cancel-btn-' + this.ID);
     var $bindedElement = document.getElementById(this.bindAt);
 
+    /*------------------------------- Afterword CSS Rectification -------------------------------------*/
+    
+    var _reactifyCSS = function() {
+      /* Button Position Absolute Well Formatting */
+      if (this.confirmBtn && this.cancelBtn) {
+        $confirmBtnElement.style.marginLeft = -$confirmBtnElement.offsetWidth - 10 + 'px';
+        $cancelBtnElement.style.marginLeft = '10px';
+      } else if (this.confirmBtn) {
+        $confirmBtnElement.style.marginLeft = -$confirmBtnElement.offsetWidth / 2 + 'px';
+      } else if (this.cancelBtn) {
+        $cancelBtnElement.style.marginLeft = -$cancelBtnElement.offsetWidth / 2 + 'px';
+      }
+    }
+
+    /*-------------------------------------- Events Setting -------------------------------------------*/
+
     var _setupEvents = function() {  
       /* Close Button Event */
       if ($closeBtnElement && this.closeBtn) {
         var _closeBtnEvent = function(event) {
           event.preventDefault();
-          _removeNode($rootElement);
+          this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
           this.enlighten = false;
         };
         $closeBtnElement.addEventListener('click', _closeBtnEvent.bind(this));
@@ -243,7 +223,7 @@
       if ($rootElement && this.allowOutsideClick) {
         var _allowOutsideClickEvent = function(event) {
           if (event.target.id === $rootElement.id && this.enlighten) {
-            _removeNode($rootElement);
+            this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
             this.enlighten = false;
           }
         };
@@ -254,7 +234,7 @@
       if (this.allowEscapeKey) {
         var _allowEscapeKeyEvent = function(event) {
           if (event.key === 'Escape' && $rootElement && this.enlighten) {
-            _removeNode($rootElement);
+            this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
             this.enlighten = false;
           }
         };
@@ -269,6 +249,7 @@
         event.preventDefault();
         this.enlighten = true;
         $rootElement.style.display = 'block';
+        _reactifyCSS();
       };
       $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
 
@@ -277,7 +258,7 @@
         var _confirmBtnOnClickEvent = function(event) {
           event.preventDefault();
           if (this.enlighten) {
-            $rootElement.style.display = 'none';
+            _displayNode($rootElement, 'none');
             this.enlighten = false;
             if (this.confirmed) {
               this.confirmed.call();
@@ -292,7 +273,7 @@
         var _cancelBtnOnClickEvent = function(event) {
           event.preventDefault();
           if (this.enlighten) {
-            $rootElement.style.display = 'none';
+            _displayNode($rootElement, 'none');
             this.enlighten = false;
             if (this.cancelled) {
               this.cancelled.call();
@@ -305,6 +286,7 @@
 
     /* Return Promise object when confirm or cancel button triggered in calling mode */
     if (this.mode === 'call' && (this.confirmBtn || this.cancelBtn)) {
+      _reactifyCSS();
       return new Promise(function(resolve, reject) {
         /* Confirm Button on Click Event */
         if (this.confirmBtn && this.enlighten) {
@@ -327,7 +309,6 @@
         }
       }.bind(this));
     }
-  
   }
 
   /*--------------------------- Helper Functions ----------------------------*/
@@ -401,5 +382,6 @@
   }
 
   function _removeNode(node) { if (node && node instanceof Node) node.parentElement.removeChild(node); }
+  function _displayNode(node, mode) { if (node && node instanceof Node) node.style.display = mode; }
 
 })();

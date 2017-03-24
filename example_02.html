@@ -9,7 +9,9 @@
 
   <!-- Include Font Family & EnlightenJS -->
   <link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+  
   <script src="enlighten.js"></script>
+  <link rel="stylesheet" href="enlighten.css">
 
 </head>
 <body>
@@ -18,8 +20,11 @@
     Enlighten({
       bindAt: 'app',
       title: 'Hello World!',
+      header: 'h1',
       confirmBtn: true,
-      cancelBtn: true,
+      cancelBtn: false,
+      animationType: 'rotateIn',
+      animationDuration: 0.5,
       confirmed: function() {
         console.log('hello')
       },
