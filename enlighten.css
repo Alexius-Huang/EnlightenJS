@@ -14,6 +14,10 @@
   position: absolute;
   top: 50%;
   left: 50%;
+  margin: auto;
+}
+.enlighten-body {
+  padding: 0 20px 20px 20px;
 }
 .enlighten-footer {
   padding: 0 20px 10px 20px;
@@ -35,17 +39,20 @@
   background-color: #333;
   transition: background-color 0.25s, color 0.25s;
   position: absolute;
+  animation-name: rotate-counterclockwise;
+  animation-duration: 0.25s;
 }
 .enlighten-close-btn:hover {
   background-color: #555;
   transition: background-color 0.25s, color 0.25s;
+  animation-name: rotate-clockwise;
+  animation-duration: 0.25s;
 }
 .enlighten-confirm-btn, .enlighten-cancel-btn {
   position: absolute;
   color: white;
   border: none;
   border-radius: 3px;
-  /*margin: 5px 10px;*/
   padding: 10px 20px;
   font-size: 12px;
   left: 50%;
@@ -68,4 +75,20 @@
   border-bottom-width: 2px;
   margin-top: 3px;
   transition: border-bottom-width 0.25s, margin-top 0.25s;
+}
+@keyframes rotate-counterclockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+@keyframes rotate-clockwise {
+  from {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }

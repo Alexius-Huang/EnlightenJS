@@ -37,8 +37,8 @@
       width:             _isNumber(argv.width)             ? argv.width             : 500,
       height:            _isNumber(argv.height)            ? argv.height            : 300,
       padding:           _isNumber(argv.padding) || _isArray(argv.padding) ? argv.padding : [5, 20],
-      headerFont:        _isString(argv.headerFont)        ? argv.headerFont        : null,
-      contentFont:       _isString(argv.contentFont)       ? argv.contentFont       : null,
+      titleFont:         _isString(argv.titleFont)         ? argv.titleFont         : 'Helvetica, serif',
+      contentFont:       _isString(argv.contentFont)       ? argv.contentFont       : 'Times New Roman, serif',
       contentAlign:      _isString(argv.contentAlign)      ? argv.contentAlign      : 'center',
       borderRadius:      _isNumber(argv.borderRadius)      ? argv.borderRadius      : 10,
       backgroundColor:   _isString(argv.backgroundColor)   ? argv.backgroundColor   : '#eee',
@@ -51,9 +51,16 @@
     this.mode = this.bindAt ? 'bind' : 'call';
     
     /* Input Validation */
+
+    /* - Bind mode should have element to bind */
     if (this.mode === 'bind' && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); return; }
+    
+    /* - Title property is globally required */
     if (this.title  === undefined) { console.error('"title" property is required!');  return; }
     
+    /* - Warning: content will override html property if content and html specified in the same time */
+    if (this.content && this.html) { console.warn('"content" property will override "html" property if both specified at the same time'); }
+
     /*
      *  Enlighten Component Schema
      *
@@ -128,7 +135,7 @@
       attributes: {
         style: _cssJSONStringify({
           textAlign: 'center',
-          fontFamily: "'bree serif', serif",
+          fontFamily: this.titleFont,
         })
       },
       children: [this.title]
@@ -142,6 +149,28 @@
         children: []
       };
       _enlightenBox.children.push(_enlightenBody);
+    
+      if (this.content) {
+        var _enlightenContent = {
+          element: 'p',
+          className: 'enlighten enlighten-content',
+          attributes: {
+            style: _cssJSONStringify({
+              textAlign: this.style.contentAlign,
+              fontFamily: this.style.contentFont
+            })
+          },
+          children: [this.content]
+        };
+        _enlightenBody.children.push(_enlightenContent);
+      } else if (this.html) {
+        var _enlightenHTMLContent = {
+          element: 'div',
+          className: 'enlighten enlighten-html-content',
+          html: this.html
+        };
+        _enlightenBody.children.push(_enlightenHTMLContent);
+      }
     }
     
     if (this.confirmBtn || this.cancelBtn) {
@@ -197,8 +226,9 @@
     var _reactifyCSS = function() {
       /* Button Position Absolute Well Formatting */
       if (this.confirmBtn && this.cancelBtn) {
-        $confirmBtnElement.style.marginLeft = -$confirmBtnElement.offsetWidth - 10 + 'px';
-        $cancelBtnElement.style.marginLeft = '10px';
+        var totalWidth = $confirmBtnElement.offsetWidth + $cancelBtnElement.offsetWidth;
+        $confirmBtnElement.style.marginLeft = -totalWidth / 2 - 10 + 'px';
+        $cancelBtnElement.style.marginLeft = -totalWidth / 2 + $confirmBtnElement.offsetWidth + 'px';
       } else if (this.confirmBtn) {
         $confirmBtnElement.style.marginLeft = -$confirmBtnElement.offsetWidth / 2 + 'px';
       } else if (this.cancelBtn) {
@@ -282,7 +312,7 @@
         }
         $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
       }
-    }
+    } else _setupEvents();
 
     /* Return Promise object when confirm or cancel button triggered in calling mode */
     if (this.mode === 'call' && (this.confirmBtn || this.cancelBtn)) {
@@ -337,7 +367,7 @@
         if (_isString(child)) wrapper.innerHTML += child;
         else wrapper.append(_jsonToHTML(child));
       }
-    }
+    } else if (json.html) wrapper.innerHTML = json.html;
     return wrapper;
   }
 
