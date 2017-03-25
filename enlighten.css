@@ -16,8 +16,25 @@
   left: 50%;
   margin: auto;
 }
+.enlighten-img-wrapper {
+  background-color: #333;
+  text-align: center;
+}
+.enlighten-img {
+  vertical-align: top;
+}
+.enlighten-header {
+  padding: 0 20px;
+}
+.enlighten-header > .enlighten-title, .enlighten-body > .enlighten-content {
+  word-wrap: break-word;
+  color: #444;
+}
 .enlighten-body {
   padding: 0 20px 20px 20px;
+}
+.enlighten-body {
+  font-size: 20px;
 }
 .enlighten-footer {
   padding: 0 20px 10px 20px;
@@ -54,7 +71,7 @@
   border: none;
   border-radius: 3px;
   padding: 10px 20px;
-  font-size: 12px;
+  font-size: 14px;
   left: 50%;
   transition: border-bottom-width 0.25s, margin-top 0.25s;
 }

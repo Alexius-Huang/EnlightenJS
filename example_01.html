@@ -20,15 +20,30 @@
       Enlighten({
         title: 'Hello World!',
         confirmBtn: true,
-        html: '<h2>您好，我是 EnlightenJS</h2>',
-        contentAlign: 'center',
-        cancelBtn: true
+        width: 1000,
+        imageWidth: 600,
+        content: 'Hello, this is EnlightenJS!',
+        imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
+        cancelBtn: true,
       }).then(function(value) {
         console.log(value)
       }).catch(function(value) {
         console.log(value);
       });
     })
+
+      Enlighten({
+        title: 'Hello World!',
+        confirmBtn: true,
+        content: 'Hello, this is EnlightenJS!',
+        //imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
+        cancelBtn: true,
+        imageHeight: 700,
+      }).then(function(value) {
+        console.log(value)
+      }).catch(function(value) {
+        console.log(value);
+      });
   </script>
 </body>
 </html>

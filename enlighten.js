@@ -10,13 +10,12 @@
     
     // Header Part
     this.title     = _isString(argv.title)     ? argv.title     : undefined;
-    this.header    = _isString(argv.header)    ? argv.header    : 'h2';
+    this.header    = _isString(argv.header)    ? argv.header    : 'h1';
 
     // Body Part
     this.content   = _isString(argv.content)   ? argv.content   : undefined;
     this.html      = _isString(argv.html)      ? argv.html      : undefined;
     this.imageURL  = _isString(argv.imageURL)  ? argv.imageURL  : undefined;
-    this.imageSize = _isString(argv.imageSize) ? argv.imageSize : '300x300';
     
     // Footer Part
     this.closeBtn       = _isBoolean(argv.closeBtn)       ? argv.closeBtn       : true;
@@ -27,6 +26,7 @@
     this.confirmed      = _isFunction(argv.confirmed)     ? argv.confirmed      : false;
     this.cancelled      = _isFunction(argv.cancelled)     ? argv.cancelled      : false;
 
+    this.autoClose         = _isNumber(argv.autoClose)          ? argv.autoClose         : NaN;
     this.allowOutsideClick = _isBoolean(argv.allowOutsideClick) ? argv.allowOutsideClick : true;
     this.allowEscapeKey    = _isBoolean(argv.allowEscapeKey)    ? argv.allowEscapeKey    : true;
 
@@ -36,40 +36,51 @@
     this.style = {
       width:             _isNumber(argv.width)             ? argv.width             : 500,
       height:            _isNumber(argv.height)            ? argv.height            : 300,
-      padding:           _isNumber(argv.padding) || _isArray(argv.padding) ? argv.padding : [5, 20],
       titleFont:         _isString(argv.titleFont)         ? argv.titleFont         : 'Helvetica, serif',
       contentFont:       _isString(argv.contentFont)       ? argv.contentFont       : 'Times New Roman, serif',
       contentAlign:      _isString(argv.contentAlign)      ? argv.contentAlign      : 'center',
+      imageWidth:        _isNumber(argv.imageWidth)        ? argv.imageWidth        : '100%',
+      imageHeight:       _isNumber(argv.imageHeight)       ? argv.imageHeight       : 'auto',
       borderRadius:      _isNumber(argv.borderRadius)      ? argv.borderRadius      : 10,
       backgroundColor:   _isString(argv.backgroundColor)   ? argv.backgroundColor   : '#eee',
       animationType:     _isString(argv.animationType)     ? argv.animationType     : 'bounceIn',
       animationDuration: _isNumber(argv.animationDuration) ? argv.animationDuration : 0.5
     };
 
+    /* Post Default Setting Modification */
+    /* - Set only image height then image width set to "auto" */
+    if (argv.imageURL && !argv.imageWidth && argv.imageHeight) { this.imageWidth = 'auto'; }
+
+    /* Enlighten Constants */
     this.ID = _randomString(10);
     this.enlighten = true;
     this.mode = this.bindAt ? 'bind' : 'call';
     
-    /* Input Validation */
-
+    /* Input Validations */
     /* - Bind mode should have element to bind */
     if (this.mode === 'bind' && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); return; }
     
     /* - Title property is globally required */
-    if (this.title  === undefined) { console.error('"title" property is required!');  return; }
+    if (argv.title  === undefined) { console.error('"title" property is required!');  return; }
     
     /* - Warning: content will override html property if content and html specified in the same time */
-    if (this.content && this.html) { console.warn('"content" property will override "html" property if both specified at the same time'); }
+    if (argv.content && argv.html) { console.warn('"content" property will override "html" property if both specified at the same time'); }
+
+    /* - Warning: value of imageWidth and imageHeight are useless since imageURL is not set */
+    if (!argv.imageURL && (argv.imageWidth || argv.imageHeight)) { console.warn('"imageWidth" and "imageHeight" properties are useless since no specification of "imageURL" property') }
 
     /*
      *  Enlighten Component Schema
      *
      *  - Root
      *    - Box
+     *      - ImgWrapper
+     *        - Img
      *      - Header
      *        - CloseBtn
      *        - Title
      *      - Body
+     *        - Content | HTML
      *      - Footer
      *        - ConfirmBtn
      *        - CancelBtn
@@ -81,7 +92,7 @@
       attributes: {
         id: 'enlighten-root-' + this.ID,
         style: _cssJSONStringify({
-          display: this.mode === 'bind' ? 'none' : 'block',
+          display: 'none',
           animation: { type: 'fadeIn', duration: 0.3 }
         })
       },
@@ -92,18 +103,41 @@
       element: 'div',
       className: 'enlighten enlighten-box',
       attributes: {
+        id: 'enlighten-box-' + this.ID,
         style: _cssJSONStringify({
           width: this.style.width + 'px',
           borderRadius: this.style.borderRadius + 'px',
           backgroundColor: this.style.backgroundColor,
-          marginTop: '-' + (this.style.height / 2) + 'px',
-          marginLeft: '-' + (this.style.width / 2) + 'px',
           animation: { type: this.style.animationType, duration: this.style.animationDuration }
         })
       },
       children: []
     };
     _enlightenRoot.children.push(_enlightenBox);
+
+    if (this.imageURL) {
+      var _enlightenImgWrapper = {
+        element: 'div',
+        className: 'enlighten enlighten-img-wrapper',
+        children: []
+      }
+      _enlightenBox.children.push(_enlightenImgWrapper);
+
+      var _enlightenImg = {
+        element: 'img',
+        className: 'enlighten enlighten-img',
+        attributes: {
+          id: 'enlighten-img-' + this.ID,
+          src: this.imageURL,
+          style: _cssJSONStringify({
+            width: _isNumber(this.style.imageWidth) ? this.style.imageWidth + 'px' : this.style.imageWidth,
+            height: _isNumber(this.style.imageHeight) ? this.style.imageHeight + 'px' : this.style.imageHeight,
+
+          })
+        }
+      }
+      _enlightenImgWrapper.children.push(_enlightenImg);
+    }
 
     var _enlightenHeader = {
       element: 'div',
@@ -213,9 +247,11 @@
 
     /* Render Root unless The Enlighten Box Binded to DOM Element */
     document.body.appendChild(_jsonToHTML(_enlightenRoot));
-    if (this.mode === 'bind') this.enlighten = false;
+    if (this.mode === 'bind') this.enlighten = false;  
 
     var $rootElement = document.getElementById('enlighten-root-' + this.ID);
+    var $boxElement = document.getElementById('enlighten-box-' + this.ID);
+    var $imgElement = document.getElementById('enlighten-img-' + this.ID);
     var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
     var $confirmBtnElement = document.getElementById('enlighten-confirm-btn-' + this.ID);
     var $cancelBtnElement = document.getElementById('enlighten-cancel-btn-' + this.ID);
@@ -223,7 +259,16 @@
 
     /*------------------------------- Afterword CSS Rectification -------------------------------------*/
     
-    var _reactifyCSS = function() {
+    var _reactifyCSS = function() { 
+      /* When imageURL presents, if image width is too big, then extend box */
+      if (argv.imageURL && $imgElement.offsetWidth > $boxElement.offsetWidth) {
+        $boxElement.style.width = $imgElement.offsetWidth + 'px';
+      }
+      
+      /* Box Position Expect to be Centered Vertically & Horizontally */
+      $boxElement.style.marginTop = -$boxElement.offsetHeight / 2 + 'px';
+      $boxElement.style.marginLeft = -$boxElement.offsetWidth / 2 + 'px';
+      
       /* Button Position Absolute Well Formatting */
       if (this.confirmBtn && this.cancelBtn) {
         var totalWidth = $confirmBtnElement.offsetWidth + $cancelBtnElement.offsetWidth;
@@ -236,9 +281,17 @@
       }
     }
 
+    /* If imageURL presents, check loaded before pop out when in call mode */
+    if (this.mode === 'call' && this.imageURL) {
+      $imgElement.addEventListener('load', function(event) {
+        $rootElement.style.display = 'block';
+        _reactifyCSS();
+      });
+    } else if (this.mode != 'bind') $rootElement.style.display = 'block';
+
     /*-------------------------------------- Events Setting -------------------------------------------*/
 
-    var _setupEvents = function() {  
+    var _setupCommonEvents = function() {  
       /* Close Button Event */
       if ($closeBtnElement && this.closeBtn) {
         var _closeBtnEvent = function(event) {
@@ -274,15 +327,28 @@
 
     /* Binded Mode */
     if (this.mode === 'bind' && $bindedElement) {
-      _setupEvents();
+      _setupCommonEvents();
+
+      /* Binded Element Event */
       var _bindedElementEvent = function(event) {
         event.preventDefault();
         this.enlighten = true;
         $rootElement.style.display = 'block';
         _reactifyCSS();
+
+        /* Auto Closeing Enlighten Box */
+        if (!isNaN(this.autoClose)) {
+          setTimeout(function() {
+            if (this.enlighten) {
+              this.enlighten = false;
+              _displayNode($rootElement, 'none');  
+            }
+          }.bind(this), this.autoClose);
+        }
+
       };
       $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
-
+      
       /* Confirm Button on Click Event */
       if (this.confirmBtn) {
         var _confirmBtnOnClickEvent = function(event) {
@@ -312,11 +378,23 @@
         }
         $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
       }
-    } else _setupEvents();
+    }
 
     /* Return Promise object when confirm or cancel button triggered in calling mode */
     if (this.mode === 'call' && (this.confirmBtn || this.cancelBtn)) {
       _reactifyCSS();
+      _setupCommonEvents();
+
+      /* Auto Closing the Enlighten Box */
+      if (!isNaN(this.autoClose)) {
+        setTimeout(function() {
+          if (this.enlighten) {
+            this.enlighten = false;
+            _removeNode($rootElement);
+          }
+        }.bind(this), this.autoClose);
+      }
+
       return new Promise(function(resolve, reject) {
         /* Confirm Button on Click Event */
         if (this.confirmBtn && this.enlighten) {
