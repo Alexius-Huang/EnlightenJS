@@ -20,30 +20,75 @@
       Enlighten({
         title: 'Hello World!',
         confirmBtn: true,
-        width: 1000,
-        imageWidth: 600,
+        //allowOutsideClick: false,
+        //closeBtn: false,
+        //content: 'Hello, this is EnlightenJS!',
+        //imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
+        form: {
+          action: 'hello.php', method: 'POST', name: 'my-form',
+          inputs: [
+            {
+              labelName: 'Your Name',
+              name: 'name',
+              placeholder: 'Enter your name here!'
+            },
+            {
+              type: 'password',
+              labelName: 'Your Password',
+              name: 'password',
+              placeholder: 'Enter your password here!'
+            },
+            {
+              type: 'switch',
+              labelName: 'Active',
+              name: 'active',
+              value: 'active'
+            },
+            {
+              type: 'checkbox',
+              labelName: 'Favorite Category',
+              name: 'category',
+              values: ['Technology', 'Travelling', 'Movie', 'Reading', 'Sports']
+            },
+            {
+              type: 'radio',
+              labelName: 'Gender',
+              name: 'gender',
+              values: ['Male', 'Female']
+            },
+            {
+              type: 'textarea',
+              labelName: 'Other Questions?',
+              name: 'question',
+              placeholder: 'Input your question here ...',
+              rows: 5
+            }
+          ]
+        },
+        cancelBtn: true,
+      }).then(function(value) {
+        console.log(value)
+      }).catch(function(value) {
+        console.log(value);
+      });
+      
+      /*
+      Enlighten({
+        title: 'Hello World!',
+        confirmBtn: true,
+        //width: 1000,
+        width: 700,
+        imageWidth: 500,
         content: 'Hello, this is EnlightenJS!',
+        //html: '<h1>Hello again</h1>',
         imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
         cancelBtn: true,
       }).then(function(value) {
         console.log(value)
       }).catch(function(value) {
         console.log(value);
-      });
-    })
-
-      Enlighten({
-        title: 'Hello World!',
-        confirmBtn: true,
-        content: 'Hello, this is EnlightenJS!',
-        //imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
-        cancelBtn: true,
-        imageHeight: 700,
-      }).then(function(value) {
-        console.log(value)
-      }).catch(function(value) {
-        console.log(value);
-      });
+      });*/
+    });
   </script>
 </body>
 </html>

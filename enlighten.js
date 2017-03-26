@@ -2,11 +2,21 @@
   
   /* Define Constructor */
   this.Enlighten = function(argv) {
-    if (!_isObject(argv)) { console.error('Show pass in "object" type value!'); return; }
+    if (!_isObject(argv)) { console.error('EnlightenJS should pass in an "object" type value'); return; }
 
     /* Arguments & Settings */
+    // Binding Mode
     this.bindAt    = _isString(argv.bindAt)    ? argv.bindAt    : undefined;
-    this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click';
+    //this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click';
+
+    // Type of Enlighten Box (Planned Implementation)
+    // - default : Plain default enlighten box
+    // - primary : Blue theme
+    // - success : Green theme
+    // - info    : Light Blue theme
+    // - warning : Yellow theme
+    // - danger  : Red theme
+    // this.type      = _isString(argv.type)      ? argv.type      : 'default';
     
     // Header Part
     this.title     = _isString(argv.title)     ? argv.title     : undefined;
@@ -15,8 +25,24 @@
     // Body Part
     this.content   = _isString(argv.content)   ? argv.content   : undefined;
     this.html      = _isString(argv.html)      ? argv.html      : undefined;
+    this.form      = _isObject(argv.form)      ? argv.form      : undefined;
     this.imageURL  = _isString(argv.imageURL)  ? argv.imageURL  : undefined;
     
+    /* - Data structure of form property
+      Object::form - String::action
+                   - String::method
+                   - String::name
+                   - String::enctype
+                   - Array::inputs - EACH -> String::type (default: "text")
+                                          -> String::labelName
+                                          -> String::name
+                                          -> String::value
+                                          -> String::placeholder
+                                          -> Object::attributes (such as checked)
+      Input types planned to support :
+        text | textarea | email | password | checkbox | radio
+    */
+
     // Footer Part
     this.closeBtn       = _isBoolean(argv.closeBtn)       ? argv.closeBtn       : true;
     this.confirmBtn     = _isBoolean(argv.confirmBtn)     ? argv.confirmBtn     : false;
@@ -31,13 +57,13 @@
     this.allowEscapeKey    = _isBoolean(argv.allowEscapeKey)    ? argv.allowEscapeKey    : true;
 
     /* Disable it will disable all the pseudo css class style */
-    this.enableStyleElement = _isBoolean(argv.enableStyleElement) ? argv.enableStyleElement : true;
+    // this.enableStyleElement = _isBoolean(argv.enableStyleElement) ? argv.enableStyleElement : true;
 
     this.style = {
       width:             _isNumber(argv.width)             ? argv.width             : 500,
       height:            _isNumber(argv.height)            ? argv.height            : 300,
-      titleFont:         _isString(argv.titleFont)         ? argv.titleFont         : 'Helvetica, serif',
-      contentFont:       _isString(argv.contentFont)       ? argv.contentFont       : 'Times New Roman, serif',
+      titleFont:         _isString(argv.titleFont)         ? argv.titleFont         : 'Righteous, cursive',
+      bodyFont:          _isString(argv.bodyFont)          ? argv.bodyFont          : 'Quicksand, serif',
       contentAlign:      _isString(argv.contentAlign)      ? argv.contentAlign      : 'center',
       imageWidth:        _isNumber(argv.imageWidth)        ? argv.imageWidth        : '100%',
       imageHeight:       _isNumber(argv.imageHeight)       ? argv.imageHeight       : 'auto',
@@ -51,6 +77,9 @@
     /* - Set only image height then image width set to "auto" */
     if (argv.imageURL && !argv.imageWidth && argv.imageHeight) { this.imageWidth = 'auto'; }
 
+    /* - When form property is specified, enlarge the width of the Enlighten box when width property is not specified */
+    if (!argv.content && !argv.html && argv.form && !argv.width) { this.style.width = 700; }
+
     /* Enlighten Constants */
     this.ID = _randomString(10);
     this.enlighten = true;
@@ -63,8 +92,10 @@
     /* - Title property is globally required */
     if (argv.title  === undefined) { console.error('"title" property is required!');  return; }
     
-    /* - Warning: content will override html property if content and html specified in the same time */
+    /* - Warning: Hierarchy of the body part : content > html > form */
     if (argv.content && argv.html) { console.warn('"content" property will override "html" property if both specified at the same time'); }
+    if (argv.content && argv.form) { console.warn('"content" property will override "form" property if both specified at the same time'); }
+    if (argv.html && argv.form)    { console.warn('"html" property will override "form" property if both specified at the same time');    }
 
     /* - Warning: value of imageWidth and imageHeight are useless since imageURL is not set */
     if (!argv.imageURL && (argv.imageWidth || argv.imageHeight)) { console.warn('"imageWidth" and "imageHeight" properties are useless since no specification of "imageURL" property') }
@@ -80,7 +111,7 @@
      *        - CloseBtn
      *        - Title
      *      - Body
-     *        - Content | HTML
+     *        - Content | HTML | Form
      *      - Footer
      *        - ConfirmBtn
      *        - CancelBtn
@@ -167,32 +198,29 @@
       element: this.header,
       className: 'enlighten enlighten-title',
       attributes: {
-        style: _cssJSONStringify({
-          textAlign: 'center',
-          fontFamily: this.titleFont,
-        })
+        style: _cssJSONStringify({ fontFamily: this.style.titleFont })
       },
       children: [this.title]
     };
     _enlightenHeader.children.push(_enlightenTitle);
 
-    if (this.content || this.html) {
+    /* Body section include Content, HTML or Form */
+    if (this.content || this.html || this.form) {
       var _enlightenBody = {
         element: 'div',
         className: 'enlighten enlighten-body',
+        attributes: { style: _cssJSONStringify({ fontFamily: this.style.bodyFont }) },
         children: []
       };
       _enlightenBox.children.push(_enlightenBody);
     
+      /* Content | HTML | Form */
       if (this.content) {
         var _enlightenContent = {
           element: 'p',
           className: 'enlighten enlighten-content',
           attributes: {
-            style: _cssJSONStringify({
-              textAlign: this.style.contentAlign,
-              fontFamily: this.style.contentFont
-            })
+            style: _cssJSONStringify({ textAlign: this.style.contentAlign })
           },
           children: [this.content]
         };
@@ -204,6 +232,19 @@
           html: this.html
         };
         _enlightenBody.children.push(_enlightenHTMLContent);
+      } else if (this.form) {
+        var _enlightenForm = {
+          element: 'form',
+          className: 'enlighten enlighten-form',
+          attributes: {
+            method: _isString(this.form.method) ? this.form.method : 'post',
+            action: _isString(this.form.action) ? this.form.action : '' ,
+            name: _isString(this.form.name) ? this.form.name : '',
+            enctype: _isString(this.form.enctype) ? this.form.enctype : 'application/x-www-form-urlencoded'
+          },
+          children: _generateFormElements(this.form.inputs)
+        };
+        _enlightenBody.children.push(_enlightenForm);
       }
     }
     
@@ -491,5 +532,168 @@
 
   function _removeNode(node) { if (node && node instanceof Node) node.parentElement.removeChild(node); }
   function _displayNode(node, mode) { if (node && node instanceof Node) node.style.display = mode; }
+  function _queryNode(selector) { return document.querySelectorAll(selector); }
+
+  function _generateFormElements(inputArray) {
+    var _jsonArray = [];
+    var _inputCount = 0;
+    for (var input of inputArray) {
+      _inputCount++;
+
+      var _labelElement = {
+        element: 'label',
+        className: 'enlighten enlighten-label',
+        attributes: {},
+        children: [{
+          element: 'p',
+          className: 'enlighten enlighten-label-title',
+          children: [input.labelName]
+        }]
+      };
+      
+      var _inputElement = {
+        element: 'input',
+        className: 'enlighten enlighten-input',
+        attributes: {
+          name: input.name,
+          value: input.value ? input.value : '',
+          type: input.type ? input.type : 'text',
+          autofocus: _inputCount === 1
+        }
+      }
+
+      switch(_inputElement.attributes.type) {
+        case 'text':
+        case 'email':
+        case 'password':
+          if (_isString(input.placeholder)) { _inputElement.attributes.placeholder = input.placeholder; }
+          break;
+        
+        case 'textarea':
+          if (_isString(input.placeholder)) { _inputElement.attributes.placeholder = input.placeholder; }
+          if (_isNumber(input.rows) && input.rows > 0) { _inputElement.attributes.rows = input.rows; }
+          _inputElement.element = 'textarea';
+          break;
+
+        case 'switch':
+          var _switchElement = {
+            element: 'div',
+            className: 'enlighten enlighten-switch-box',
+            children: [{
+              element: 'div',
+              className: 'enlighten enlighten-switch',
+            }]
+          }
+          
+          _inputElement.attributes.type  = 'checkbox';
+          _inputElement.attributes.style = _cssJSONStringify({
+            display: 'none',
+            position: 'absolute',
+            left: '-1000px'
+          });
+          _labelElement.attributes.style = _cssJSONStringify({
+            width: '80px'
+          });
+          break;
+
+        case 'checkbox':
+          if (_isObject(input.values) && input.values.length > 0) {
+            var _checkboxGroupElement = {
+              element: 'div',
+              className: 'enlighten enlighten-checkbox-group',
+              children: [{
+                element: 'p',
+                className: 'enlighten enlighten-label-title',
+                children: [input.labelName]
+              }]
+            }
+
+            for (var value of input.values) {
+              if (_isString(value)) {
+                var _inputElement = {
+                  element: 'input',
+                  className: 'enlighten enlighten-checkbox',
+                  attributes: {
+                    type: 'checkbox',
+                    name: input.name,
+                    value: value,
+                    id: 'enlighten-checkbox-' + value
+                  }
+                };
+                var _labelElement = {
+                  element: 'label',
+                  className: 'enlighten enlighten-checkbox-label',
+                  attributes: { for: _inputElement.attributes.id },
+                  children: [value]
+                };
+                _checkboxGroupElement.children.push(_inputElement);
+                _checkboxGroupElement.children.push(_labelElement);
+              } else console.warn('value of the checkbox should be type of "string" but not "' + (typeof value) + '"')
+            }
+            _jsonArray.push(_checkboxGroupElement);
+          } else {
+            console.error('"checkbox" type input should specify "values" property in order to generate checkboxes');
+            continue;
+          }
+          break;
+
+        case 'radio':
+          if (_isObject(input.values) && input.values.length > 0) {
+            var _radioGroupElement = {
+              element: 'div',
+              className: 'enlighten enlighten-radio-group',
+              children: [{
+                element: 'p',
+                className: 'enlighten enlighten-label-title',
+                children: [input.labelName]
+              }]
+            }
+
+            for (var value of input.values) {
+              if (_isString(value)) {
+                var _inputElement = {
+                  element: 'input',
+                  className: 'enlighten enlighten-radio',
+                  attributes: {
+                    type: 'radio',
+                    name: input.name,
+                    value: value,
+                    id: 'enlighten-radio-' + value
+                  }
+                };
+                var _labelElement = {
+                  element: 'label',
+                  className: 'enlighten enlighten-radio-label',
+                  attributes: { for: _inputElement.attributes.id },
+                  children: [value]
+                };
+                _radioGroupElement.children.push(_inputElement);
+                _radioGroupElement.children.push(_labelElement);
+              } else console.warn('value of the radio should be type of "string" but not "' + (typeof value) + '"')
+            }
+            _jsonArray.push(_radioGroupElement);
+          } else {
+            console.error('"radio" type input should specify "values" property in order to generate checkboxes');
+            continue;
+          }
+          break;
+
+        default: 
+          console.error('there is no support for "' + input.type + '" type of input')
+      }
+
+      /* Exclude from type of 'checkbox' | 'radio' */
+      if (input.type !== 'checkbox' && input.type !== 'radio') {
+        _labelElement.children.push(_inputElement);
+        
+        /* When type is switch then push in the switch style elements */
+        if (input.type === 'switch') { _labelElement.children.push(_switchElement); }
+        
+        _jsonArray.push(_labelElement);
+      }
+    }
+
+    return _jsonArray;
+  }
 
 })();
