@@ -5,10 +5,6 @@
     if (!_isObject(argv)) { console.error('EnlightenJS should pass in an "object" type value'); return; }
 
     /* Arguments & Settings */
-    // Binding Mode
-    this.bindAt    = _isString(argv.bindAt)    ? argv.bindAt    : undefined;
-    //this.bindEvent = _isString(argv.bindEvent) ? argv.bindEvent : 'click';
-
     // Type of Enlighten Box (Planned Implementation)
     // - default : Plain default enlighten box
     // - primary : Blue theme
@@ -83,11 +79,8 @@
     /* Enlighten Constants */
     this.ID = _randomString(10);
     this.enlighten = true;
-    this.mode = this.bindAt ? 'bind' : 'call';
     
     /* Input Validations */
-    /* - Bind mode should have element to bind */
-    if (this.mode === 'bind' && !document.getElementById(this.bindAt)) { console.error('cannot locate and bind at element where element ID is "' + this.bindAt + '"'); return; }
     
     /* - Title property is globally required */
     if (argv.title  === undefined) { console.error('"title" property is required!');  return; }
@@ -286,9 +279,8 @@
       });
     }
 
-    /* Render Root unless The Enlighten Box Binded to DOM Element */
+    /* Render Enlighten Root */
     document.body.appendChild(_jsonToHTML(_enlightenRoot));
-    if (this.mode === 'bind') this.enlighten = false;  
 
     var $rootElement = document.getElementById('enlighten-root-' + this.ID);
     var $boxElement = document.getElementById('enlighten-box-' + this.ID);
@@ -296,8 +288,7 @@
     var $closeBtnElement = document.getElementById('enlighten-close-btn-' + this.ID);
     var $confirmBtnElement = document.getElementById('enlighten-confirm-btn-' + this.ID);
     var $cancelBtnElement = document.getElementById('enlighten-cancel-btn-' + this.ID);
-    var $bindedElement = document.getElementById(this.bindAt);
-
+    
     /*------------------------------- Afterword CSS Rectification -------------------------------------*/
     
     var _reactifyCSS = function() { 
@@ -322,22 +313,22 @@
       }
     }
 
-    /* If imageURL presents, check loaded before pop out when in call mode */
-    if (this.mode === 'call' && this.imageURL) {
+    /* If imageURL presents, check loaded before pop out */
+    if (this.imageURL) {
       $imgElement.addEventListener('load', function(event) {
         $rootElement.style.display = 'block';
         _reactifyCSS();
       });
-    } else if (this.mode != 'bind') $rootElement.style.display = 'block';
+    } else $rootElement.style.display = 'block';
 
     /*-------------------------------------- Events Setting -------------------------------------------*/
 
-    var _setupCommonEvents = function() {  
+    var _setupEvents = function() {  
       /* Close Button Event */
       if ($closeBtnElement && this.closeBtn) {
         var _closeBtnEvent = function(event) {
           event.preventDefault();
-          this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
+          _removeNode($rootElement);
           this.enlighten = false;
         };
         $closeBtnElement.addEventListener('click', _closeBtnEvent.bind(this));
@@ -347,7 +338,7 @@
       if ($rootElement && this.allowOutsideClick) {
         var _allowOutsideClickEvent = function(event) {
           if (event.target.id === $rootElement.id && this.enlighten) {
-            this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
+            _removeNode($rootElement);
             this.enlighten = false;
           }
         };
@@ -358,7 +349,7 @@
       if (this.allowEscapeKey) {
         var _allowEscapeKeyEvent = function(event) {
           if (event.key === 'Escape' && $rootElement && this.enlighten) {
-            this.mode === 'call' ? _removeNode($rootElement) : _displayNode($rootElement, 'none');
+            _removeNode($rootElement);
             this.enlighten = false;
           }
         };
@@ -366,65 +357,10 @@
       }
     }.bind(this);
 
-    /* Binded Mode */
-    if (this.mode === 'bind' && $bindedElement) {
-      _setupCommonEvents();
-
-      /* Binded Element Event */
-      var _bindedElementEvent = function(event) {
-        event.preventDefault();
-        this.enlighten = true;
-        $rootElement.style.display = 'block';
-        _reactifyCSS();
-
-        /* Auto Closeing Enlighten Box */
-        if (!isNaN(this.autoClose)) {
-          setTimeout(function() {
-            if (this.enlighten) {
-              this.enlighten = false;
-              _displayNode($rootElement, 'none');  
-            }
-          }.bind(this), this.autoClose);
-        }
-
-      };
-      $bindedElement.addEventListener('click', _bindedElementEvent.bind(this));
-      
-      /* Confirm Button on Click Event */
-      if (this.confirmBtn) {
-        var _confirmBtnOnClickEvent = function(event) {
-          event.preventDefault();
-          if (this.enlighten) {
-            _displayNode($rootElement, 'none');
-            this.enlighten = false;
-            if (this.confirmed) {
-              this.confirmed.call();
-            } else console.warn('"confirmed" property didn\'t setup properly');
-          }
-        }
-        $confirmBtnElement.addEventListener('click', _confirmBtnOnClickEvent.bind(this));
-      }
-      
-      /* Cancel Button on Click Event */
-      if (this.cancelBtn) {
-        var _cancelBtnOnClickEvent = function(event) {
-          event.preventDefault();
-          if (this.enlighten) {
-            _displayNode($rootElement, 'none');
-            this.enlighten = false;
-            if (this.cancelled) {
-              this.cancelled.call();
-            } else console.warn('"cancelled" property didn\'t setup properly')
-          }
-        }
-        $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
-      }
-    }
-
     /* Return Promise object when confirm or cancel button triggered in calling mode */
-    if (this.mode === 'call' && (this.confirmBtn || this.cancelBtn)) {
+    if (this.confirmBtn || this.cancelBtn) {
       _reactifyCSS();
-      _setupCommonEvents();
+      _setupEvents();
 
       /* Auto Closing the Enlighten Box */
       if (!isNaN(this.autoClose)) {
@@ -597,51 +533,11 @@
           break;
 
         case 'checkbox':
-          if (_isObject(input.values) && input.values.length > 0) {
-            var _checkboxGroupElement = {
-              element: 'div',
-              className: 'enlighten enlighten-checkbox-group',
-              children: [{
-                element: 'p',
-                className: 'enlighten enlighten-label-title',
-                children: [input.labelName]
-              }]
-            }
-
-            for (var value of input.values) {
-              if (_isString(value)) {
-                var _inputElement = {
-                  element: 'input',
-                  className: 'enlighten enlighten-checkbox',
-                  attributes: {
-                    type: 'checkbox',
-                    name: input.name,
-                    value: value,
-                    id: 'enlighten-checkbox-' + value
-                  }
-                };
-                var _labelElement = {
-                  element: 'label',
-                  className: 'enlighten enlighten-checkbox-label',
-                  attributes: { for: _inputElement.attributes.id },
-                  children: [value]
-                };
-                _checkboxGroupElement.children.push(_inputElement);
-                _checkboxGroupElement.children.push(_labelElement);
-              } else console.warn('value of the checkbox should be type of "string" but not "' + (typeof value) + '"')
-            }
-            _jsonArray.push(_checkboxGroupElement);
-          } else {
-            console.error('"checkbox" type input should specify "values" property in order to generate checkboxes');
-            continue;
-          }
-          break;
-
         case 'radio':
           if (_isObject(input.values) && input.values.length > 0) {
-            var _radioGroupElement = {
+            var _groupElement = {
               element: 'div',
-              className: 'enlighten enlighten-radio-group',
+              className: 'enlighten enlighten-' + input.type + '-group',
               children: [{
                 element: 'p',
                 className: 'enlighten enlighten-label-title',
@@ -653,32 +549,32 @@
               if (_isString(value)) {
                 var _inputElement = {
                   element: 'input',
-                  className: 'enlighten enlighten-radio',
+                  className: 'enlighten enlighten-' + input.type,
                   attributes: {
-                    type: 'radio',
+                    type: input.type,
                     name: input.name,
                     value: value,
-                    id: 'enlighten-radio-' + value
+                    id: 'enlighten-' + input.type + '-' + value
                   }
                 };
                 var _labelElement = {
                   element: 'label',
-                  className: 'enlighten enlighten-radio-label',
+                  className: 'enlighten enlighten-' + input.type + '-label',
                   attributes: { for: _inputElement.attributes.id },
                   children: [value]
                 };
-                _radioGroupElement.children.push(_inputElement);
-                _radioGroupElement.children.push(_labelElement);
-              } else console.warn('value of the radio should be type of "string" but not "' + (typeof value) + '"')
+                _groupElement.children.push(_inputElement);
+                _groupElement.children.push(_labelElement);
+              } else console.warn('value of the ' + input.type + ' should be type of "string" but not "' + (typeof value) + '"')
             }
-            _jsonArray.push(_radioGroupElement);
+            _jsonArray.push(_groupElement);
           } else {
-            console.error('"radio" type input should specify "values" property in order to generate checkboxes');
+            console.error('"' + input.type + '" type input should specify "values" property in order to generate ' + input.type );
             continue;
           }
           break;
 
-        default: 
+        default:
           console.error('there is no support for "' + input.type + '" type of input')
       }
 
