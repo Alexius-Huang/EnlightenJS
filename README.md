@@ -4,14 +4,14 @@
 EnlightenJS is built by Maxwell Alexius, it is a simple JavaScript plugin that can render out HTML pop out lightbox with just a few lines of code.
 
 ## <span id="main">Manual</span>
-- [Getting Started](#readme-getting-started)
-- [Enlighten Box Structure](#readme-enlighten-structure)
-- [Enlighten Features](#readme-enlighten-features)
-- [Enlighten Image](#readme-enlighten-image)
-- [Enlighten Form](#readme-enlighten-form)
-- [Enlighten Styling](#readme-enlighten-styling)
+- [Getting Started](#getting-started)
+- [Enlighten Box Structure](#enlighten-structure)
+- [Enlighten Features](#enlighten-features)
+- [Enlighten Image](#enlighten-image)
+- [Enlighten Form](#enlighten-form)
+- [Enlighten Styling](#enlighten-styling)
 
-## <span id="readme-getting-started">Getting Started</span>
+## <span id="getting-started">Getting Started</span>
 
 You can clone this repository and include the JS and CSS file in your HTML document :
 
@@ -60,10 +60,10 @@ Enlighten({
 
 Check out the [manual](#main) to see other features which is provided by EnlightenJS!
 
-## <span id="readme-enlighten-structure">Enlighten Box Structure</span>
+## <span id="enlighten-structure">Enlighten Box Structure</span>
 
 ### Basic Structure
-EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the [Enlighten Image](#readme-enlighten-image) section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
+EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the [Enlighten Image](#enlighten-image) section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
 
 ```
   - Enlighten Root
@@ -80,7 +80,7 @@ EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly 
 
 [Back To Menu](#main)
 
-## <span id="readme-enlighten-features">Enlighten Features</span>
+## <span id="enlighten-features">Enlighten Features</span>
 
 ### `title` Property is Required in EnlightenJS
 In order to render out the Enlighten box, it is required to input an object which at least contains `title` property. If EnlightenJS didn't know the value of the `title`, it will console out the error message and won't render out the Enlighten box.
@@ -151,7 +151,7 @@ Enlighten({
 
 <img src="./img/enlighten_features_02.png" />
 
-Another awesome feature is to use the `form` property supported by EnlightenJS, it can automatically generate the HTML form from the value of the `form` property accordingly. <a href="#readme-enlighten-form">Look for more information about Enlighten Form</a>.
+Another awesome feature is to use the `form` property supported by EnlightenJS, it can automatically generate the HTML form from the value of the `form` property accordingly. <a href="#enlighten-form">Look for more information about Enlighten Form</a>.
 
 **Warning! This feature is currently under construction, thie image shows the prototype of the result, the feature may vary in nearly future.**
 
@@ -195,13 +195,13 @@ There are three types of content can show in the Enlighten body part, which are 
 EnlightenJS will warn you in the console when you have two or all of them specified at the same time, just to mention that you can make your code simplified in Enlighten object.
 
 ### Styling Enlighten Box
-Enlighten provides several styling properties. The most basic one is the `width` property which can resize the width of the Enlighten box. Or you can use the `backgroundColor` property to specify the background color of the Enlighten box. <a href="#readme-enlighten-styling">Look for more information about Enlighten Style properties</a>.
+Enlighten provides several styling properties. The most basic one is the `width` property which can resize the width of the Enlighten box. Or you can use the `backgroundColor` property to specify the background color of the Enlighten box. <a href="#enlighten-styling">Look for more information about Enlighten Style properties</a>.
 
-For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#readme-enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
+For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
 
 [Back To Menu](#main)
 
-## <span id="readme-enlighten-image">Enlighten Image</span>
+## <span id="enlighten-image">Enlighten Image</span>
 
 ### Using `imageURL` Property
 Add image to Enlighten box is simple, using the `imageURL` attribute and give the URL of the image file, it will automatically help you resize the image and render it in a beautiful format :
@@ -249,13 +249,13 @@ Enlighten({
 
 [Back To Menu](#main)
 
-## <span id="readme-enlighten-form">Enlighten Form</span>
+## <span id="enlighten-form">Enlighten Form</span>
 
 Under Construction
 
 [Back To Menu](#main)
 
-## <span id="readme-enlighten-styling">Enlighten Styling</span>
+## <span id="enlighten-styling">Enlighten Styling</span>
 
 Under Construction
 
