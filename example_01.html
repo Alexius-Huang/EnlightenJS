@@ -71,29 +71,16 @@
         },
         cancelBtn: true,
       }).then(function(value) {
-        console.log(value)
+        console.log('confirmed')
       }).catch(function(value) {
-        console.log(value);
+        console.log('cancelled');
       });
      
       
-Enlighten({
-  title: 'Are you sure ?',
-  content: 'You are going to use EnlighteJS',
-  confirmBtn: true,
-  cancelBtn: true,
-  allowOutsideClick: false
-}).then(function() {
-  Enlighten({
-    title: 'Congratulation!'
-  });
-}).catch(function() {
-  Enlighten({
-    title: 'Try it again ~ Please ~'
-  });
-});
 
     });
+
+    Enlighten('Hello')
   </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
   
   /* Define Constructor */
   this.Enlighten = function(argv) {
+    if (_isString(argv)) { argv = { title: argv }; }
     if (!_isObject(argv)) { console.error('EnlightenJS should pass in an "object" type value'); return; }
 
     /* Arguments & Settings */
@@ -82,7 +83,7 @@
     /* Input Validations */
     
     /* - Title property is globally required */
-    if (argv.title  === undefined) { console.error('"title" property is required!');  return; }
+    if (argv.title  === undefined) { console.error('"title" property is required');  return; }
     
     /* - Warning: Hierarchy of the body part : content > html > form */
     if (argv.content && argv.html) { console.warn('"content" property will override "html" property if both specified at the same time'); }
@@ -220,7 +221,7 @@
       } else if (this.html) {
         var _enlightenHTMLContent = {
           element: 'div',
-          className: 'enlighten enlighten-html-content',
+          className: 'enlighten enlighten-html',
           html: this.html
         };
         _enlightenBody.children.push(_enlightenHTMLContent);
@@ -527,7 +528,7 @@
             left: '-1000px'
           });
           _labelElement.attributes.style = _cssJSONStringify({
-            width: '80px'
+            //width: '80px'
           });
           break;
 

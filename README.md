@@ -6,7 +6,10 @@ EnlightenJS is built by Maxwell Alexius, it is a simple JavaScript plugin that c
 ## <span id="main">Manual</span>
 - <a href="#readme-getting-started">Getting Started</a>
 - <a href="#readme-enlighten-structure">Enlighten Box Structure</a>
+- <a href="#readme-enlighten-features">Enlighten Features</a>
 - <a href="#readme-enlighten-image">Enlighten Image</a>
+- <a href="#readme-enlighten-form">Enlighten Form</a>
+- <a href="#readme-enlighten-styling">Enlighten Styling</a>
 
 ## <span id="readme-getting-started">Getting Started</span>
 
@@ -59,10 +62,148 @@ Check out the <a href="#main">manual</a> to see other features which is provided
 
 ## <span id="readme-enlighten-structure">Enlighten Box Structure</span>
 
-Under Construction
+### Basic Structure
+EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the <a href="#readme-enlighten-image">Enlighten Image</a> section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
+
+```
+  - Enlighten Root
+    - Enlighten Box
+      - Header
+        - CloseBtn (The top-right button which can close the Enlighten box)
+        - Title
+      - Body
+        - Content | HTML | Form
+      - Footer
+        - ConfirmBtn
+        - CancelBtn
+```
+
+<a href="#main">Back To Menu</a>
+
+## <span id="readme-enlighten-features">Enlighten Features</span>
+
+### `title` Property is Required in EnlightenJS
+In order to render out the Enlighten box, it is required to input an object which at least contains `title` property. If EnlightenJS didn't know the value of the `title`, it will console out the error message and won't render out the Enlighten box.
+
+```js
+Enlighten({
+  title: "Hello! EnlightenJS!"
+});
+```
+
+Instead of input an object, you can also choose to input a string which, in default, is set to be as the title of the Enlighten box :
+
+```js
+Enlighten("Hello! EnlightenJS!")
+```
+
+### Confirm & Cancel Buttons
+EnlightenJS provide a simple confirmation box feature, specifing either one or both of the `confirmBtn` and `cancelBtn` property to `true`, you can generate the Enlighten box with buttons inside the footer part. You can change the text on the buttons using `confirmBtnText` and `cancelBtnText`. When there exist a button, it will return a `Promise` object which can let you chain the `then` and the `catch` methods on Enlighten object.
+
+```js
+Enlighten({
+  title: 'Are you sure you fed the cat?',
+  confirmBtn: true,
+  cancelBtn: true,
+  confirmBtnText: 'Yep!',
+  cancelBtnText: 'Oh... I forgot it...'
+}).then(function() {
+  Enlighten('Great, next you need to clean its poop!');
+}).catch(function() {
+  Enlighten('Oh no! The cat is starving!');
+});
+```
+
+<img src="./img/enlighten_features_01.png" />
+
+### Pop Out Animation
+You can specify the animation type using the `animationType` property. You can check out <a href="https://daneden.github.io/animate.css/">animate.css</a> to see the type of the animation, however, you don't need to include it. The duration of the animation can be specified by the `animationDuration` property with the number value with unit of second.
+
+```js
+Enlighten({
+  title: 'EnlightenJS Provides Animation ~ !',
+  content: 'Simply specify the type of the animation to the animationType property!',
+  width: 800,
+  animationType: 'tada',
+  animationDuration: 1
+});
+```
+
+### Enlighten Body Content, HTML or Form
+You can add the message of the Enlighten box via the `content` property, the content will be placed in the body part of the Enlighten box structure. Default style `text-align` is `"center"` and used `"Quicksand, serif"` as default `font-family`.
+
+```js
+Enlighten({
+  title: 'Curiosity Killed The Cat',
+  content: 'However... Satisfaction Brought it Back!'
+});
+```
+
+You can also input HTML tags as a string into `html` property provided by EnlightenJS. Input HTML string will be converted to nodes and appended as child elements to the body part of the Enlighten box.
+
+```js
+Enlighten({
+  title: 'Curiosity Killed The Cat',
+  width: 800,
+  html: '<h1 style="text-align: center;"><i>However</i>... <mark>Satisfaction</mark> Brought it Back!</h1>'
+});
+```
+
+<img src="./img/enlighten_features_02.png" />
+
+Another awesome feature is to use the `form` property supported by EnlightenJS, it can automatically generate the HTML form from the value of the `form` property accordingly. <a href="#readme-enlighten-form">Look for more information about Enlighten Form</a>.
+
+**Warning! This feature is currently under construction, thie image shows the prototype of the result, the feature may vary in nearly future.**
+
+```js
+Enlighten({
+  title: 'Sign Up',
+  confirmBtn: true,
+  cancelBtn: true,
+  confirmBtnText: 'Submit',
+  form: {
+    action: 'simple_form',
+    method: 'post',
+    name: 'signup-form',
+    inputs: [
+      {
+        type: 'email',
+        labelName: 'Email',
+        name: 'email',
+        placeholder: 'Enter your email here!'
+      },
+      {
+        type: 'password',
+        labelName: 'Password',
+        name: 'password',
+        placeholder: 'Enter your password here!'
+      },
+      {
+        type: 'switch',
+        labelName: 'Subscribe to Our News Letter?',
+        name: 'subscribe'
+      }
+    ]
+  }
+});
+```
+<img src="./img/enlighten_features_03.png" />
+
+### Precedence of the Body Part
+There are three types of content can show in the Enlighten body part, which are `content`, `html` and `form`. **Default `content` have the highest priorty than `html` and `form` property**, which means when the `content` property presents, the other two properties will have no effect. The next is the `html` and the last is `form` content, which means when `html` and `form` are specified at the same time, the `form` will not generated while `html` string will be converted to elements in normal condition.
+
+EnlightenJS will warn you in the console when you have two or all of them specified at the same time, just to mention that you can make your code simplified in Enlighten object.
+
+### Styling Enlighten Box
+Enlighten provides several styling properties. The most basic one is the `width` property which can resize the width of the Enlighten box. Or you can use the `backgroundColor` property to specify the background color of the Enlighten box. <a href="#readme-enlighten-styling">Look for more information about Enlighten Style properties</a>.
+
+For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#readme-enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
+
+<a href="#main">Back To Menu</a>
 
 ## <span id="readme-enlighten-image">Enlighten Image</span>
 
+### Using `imageURL` Property
 Add image to Enlighten box is simple, using the `imageURL` attribute and give the URL of the image file, it will automatically help you resize the image and render it in a beautiful format :
 
 ```js
@@ -75,7 +216,24 @@ Enlighten({
 
 <img src="./img/enlighten_image_01.png" />
 
-There are other attributes you can use, such as using `width` property to resize the Enlighten box or `imageWidth` to resize the width of the image :
+### Enlighten Image Structure
+By inspecting the rendered HTML Enlighten box, you will see the image is wrapped by `div.image-wrapper` and is out of the base box structure. So the main Enlighten box structure should become like this :
+
+```
+  - Enlighten Root
+    - Enlighten Box
+      - Image Wrapper
+        - Your Image
+      - Header
+        - CloseBtn
+        - Title
+
+        ... (omitted) ...
+```
+
+### Resizing Image & Enlighten Box
+
+There are other properties you can use, such as using `width` property to resize the Enlighten box or `imageWidth` to resize the width of the image :
 
 ```js
 Enlighten({
@@ -94,3 +252,11 @@ Enlighten({
 ## <span id="readme-enlighten-form">Enlighten Form</span>
 
 Under Construction
+
+<a href="#main">Back To Menu</a>
+
+## <span id="readme-enlighten-styling">Enlighten Styling</span>
+
+Under Construction
+
+<a href="#main">Back To Menu</a>
