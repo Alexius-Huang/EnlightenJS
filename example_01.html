@@ -14,7 +14,11 @@
 </head>
 <body>
   <button id="app">Click Me</button>
-  <script>
+  <script> 
+  /*Enlighten({
+    title: 'Hello World!',
+    content: 'You are using EnlightenJS!'
+  });*/
     document.getElementById('app').addEventListener('click', function(event){
       event.preventDefault();
       Enlighten({
@@ -23,7 +27,7 @@
         //allowOutsideClick: false,
         //closeBtn: false,
         //content: 'Hello, this is EnlightenJS!',
-        imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
+        //imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
         form: {
           action: 'hello.php', method: 'POST', name: 'my-form',
           inputs: [
@@ -71,23 +75,24 @@
       }).catch(function(value) {
         console.log(value);
       });
+     
       
-      /*
-      Enlighten({
-        title: 'Hello World!',
-        confirmBtn: true,
-        //width: 1000,
-        width: 700,
-        imageWidth: 500,
-        content: 'Hello, this is EnlightenJS!',
-        //html: '<h1>Hello again</h1>',
-        imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
-        cancelBtn: true,
-      }).then(function(value) {
-        console.log(value)
-      }).catch(function(value) {
-        console.log(value);
-      });*/
+Enlighten({
+  title: 'Are you sure ?',
+  content: 'You are going to use EnlighteJS',
+  confirmBtn: true,
+  cancelBtn: true,
+  allowOutsideClick: false
+}).then(function() {
+  Enlighten({
+    title: 'Congratulation!'
+  });
+}).catch(function() {
+  Enlighten({
+    title: 'Try it again ~ Please ~'
+  });
+});
+
     });
   </script>
 </body>

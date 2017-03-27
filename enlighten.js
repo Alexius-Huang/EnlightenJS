@@ -34,7 +34,6 @@
                                           -> String::name
                                           -> String::value
                                           -> String::placeholder
-                                          -> Object::attributes (such as checked)
       Input types planned to support :
         text | textarea | email | password | checkbox | radio
     */
@@ -356,12 +355,12 @@
         document.body.addEventListener('keyup', _allowEscapeKeyEvent.bind(this));
       }
     }.bind(this);
+    
+    _reactifyCSS();
+    _setupEvents();
 
     /* Return Promise object when confirm or cancel button triggered in calling mode */
     if (this.confirmBtn || this.cancelBtn) {
-      _reactifyCSS();
-      _setupEvents();
-
       /* Auto Closing the Enlighten Box */
       if (!isNaN(this.autoClose)) {
         setTimeout(function() {
