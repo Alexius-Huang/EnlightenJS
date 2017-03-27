@@ -3,9 +3,9 @@
 
 EnlightenJS is built by Maxwell Alexius, it is a simple JavaScript plugin that can render out HTML pop out lightbox with just a few lines of code.
 
-## <span id="main">Manual</span>
+## <span id="manual">Manual</span>
 - [Getting Started](#getting-started)
-- [Enlighten Box Structure](#enlighten-structure)
+- [Enlighten Box Structure](#enlighten-box-structure)
 - [Enlighten Features](#enlighten-features)
 - [Enlighten Image](#enlighten-image)
 - [Enlighten Form](#enlighten-form)
@@ -58,9 +58,9 @@ Enlighten({
 
 <img src="./img/getting_started_02.png" />
 
-Check out the [manual](#main) to see other features which is provided by EnlightenJS!
+Check out the [manual](#maual) to see other features which is provided by EnlightenJS!
 
-## <span id="enlighten-structure">Enlighten Box Structure</span>
+## <span id="enlighten-box-structure">Enlighten Box Structure</span>
 
 ### Basic Structure
 EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the [Enlighten Image](#enlighten-image) section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
@@ -78,7 +78,7 @@ EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly 
         - CancelBtn
 ```
 
-[Back To Menu](#main)
+[Back To Menu](#maual)
 
 ## <span id="enlighten-features">Enlighten Features</span>
 
@@ -199,7 +199,7 @@ Enlighten provides several styling properties. The most basic one is the `width`
 
 For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
 
-[Back To Menu](#main)
+[Back To Menu](#maual)
 
 ## <span id="enlighten-image">Enlighten Image</span>
 
@@ -247,16 +247,16 @@ Enlighten({
 
 <img src="./img/enlighten_image_02.png" />
 
-[Back To Menu](#main)
+[Back To Menu](#maual)
 
 ## <span id="enlighten-form">Enlighten Form</span>
 
 Under Construction
 
-[Back To Menu](#main)
+[Back To Menu](#maual)
 
 ## <span id="enlighten-styling">Enlighten Styling</span>
 
 Under Construction
 
-[Back To Menu](#main)
+[Back To Menu](#maual)
