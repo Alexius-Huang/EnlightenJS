@@ -4,12 +4,12 @@
 EnlightenJS is built by Maxwell Alexius, it is a simple JavaScript plugin that can render out HTML pop out lightbox with just a few lines of code.
 
 ## <span id="main">Manual</span>
-- <a href="#readme-getting-started">Getting Started</a>
-- <a href="#readme-enlighten-structure">Enlighten Box Structure</a>
-- <a href="#readme-enlighten-features">Enlighten Features</a>
-- <a href="#readme-enlighten-image">Enlighten Image</a>
-- <a href="#readme-enlighten-form">Enlighten Form</a>
-- <a href="#readme-enlighten-styling">Enlighten Styling</a>
+- [Getting Started](#readme-getting-started)
+- [Enlighten Box Structure](#readme-enlighten-structure)
+- [Enlighten Features](#readme-enlighten-features)
+- [Enlighten Image](#readme-enlighten-image)
+- [Enlighten Form](#readme-enlighten-form)
+- [Enlighten Styling](#readme-enlighten-styling)
 
 ## <span id="readme-getting-started">Getting Started</span>
 
@@ -58,12 +58,12 @@ Enlighten({
 
 <img src="./img/getting_started_02.png" />
 
-Check out the <a href="#main">manual</a> to see other features which is provided by EnlightenJS!
+Check out the [manual](#main) to see other features which is provided by EnlightenJS!
 
 ## <span id="readme-enlighten-structure">Enlighten Box Structure</span>
 
 ### Basic Structure
-EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the <a href="#readme-enlighten-image">Enlighten Image</a> section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
+EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly divided into three parts which are `header`, `body` and `footer`. (However, in the [Enlighten Image](#readme-enlighten-image) section, the `image-wrapper` is the fourth part which is placed in the beginning of the box structure and before the `header` part.) This is the base structure of the Enlighten Box, starting with its root element :
 
 ```
   - Enlighten Root
@@ -78,7 +78,7 @@ EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly 
         - CancelBtn
 ```
 
-<a href="#main">Back To Menu</a>
+[Back To Menu](#main)
 
 ## <span id="readme-enlighten-features">Enlighten Features</span>
 
@@ -117,7 +117,7 @@ Enlighten({
 <img src="./img/enlighten_features_01.png" />
 
 ### Pop Out Animation
-You can specify the animation type using the `animationType` property. You can check out <a href="https://daneden.github.io/animate.css/">animate.css</a> to see the type of the animation, however, you don't need to include it. The duration of the animation can be specified by the `animationDuration` property with the number value with unit of second.
+You can specify the animation type using the `animationType` property. You can check out [animate.css](https://daneden.github.io/animate.css/) to see the type of the animation, however, you don't need to include it. The duration of the animation can be specified by the `animationDuration` property with the number value with unit of second.
 
 ```js
 Enlighten({
@@ -199,7 +199,7 @@ Enlighten provides several styling properties. The most basic one is the `width`
 
 For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#readme-enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
 
-<a href="#main">Back To Menu</a>
+[Back To Menu](#main)
 
 ## <span id="readme-enlighten-image">Enlighten Image</span>
 
@@ -247,16 +247,16 @@ Enlighten({
 
 <img src="./img/enlighten_image_02.png" />
 
-<a href="#main">Back To Menu</a>
+[Back To Menu](#main)
 
 ## <span id="readme-enlighten-form">Enlighten Form</span>
 
 Under Construction
 
-<a href="#main">Back To Menu</a>
+[Back To Menu](#main)
 
 ## <span id="readme-enlighten-styling">Enlighten Styling</span>
 
 Under Construction
 
-<a href="#main">Back To Menu</a>
+[Back To Menu](#main)
