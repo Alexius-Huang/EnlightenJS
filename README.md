@@ -58,7 +58,7 @@ Enlighten({
 
 <img src="./img/getting_started_02.png" />
 
-Check out the [manual](#maual) to see other features which is provided by EnlightenJS!
+Check out the [manual](#manual) to see other features which is provided by EnlightenJS!
 
 ## <span id="enlighten-box-structure">Enlighten Box Structure</span>
 
@@ -78,7 +78,7 @@ EnlightenJS provides a simple way to render out HTML lightbox, it can be mainly 
         - CancelBtn
 ```
 
-[Back To Menu](#maual)
+[Back To Menu](#manual)
 
 ## <span id="enlighten-features">Enlighten Features</span>
 
@@ -199,7 +199,7 @@ Enlighten provides several styling properties. The most basic one is the `width`
 
 For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
 
-[Back To Menu](#maual)
+[Back To Menu](#manual)
 
 ## <span id="enlighten-image">Enlighten Image</span>
 
@@ -247,16 +247,16 @@ Enlighten({
 
 <img src="./img/enlighten_image_02.png" />
 
-[Back To Menu](#maual)
+[Back To Menu](#manual)
 
 ## <span id="enlighten-form">Enlighten Form</span>
 
 Under Construction
 
-[Back To Menu](#maual)
+[Back To Menu](#manual)
 
 ## <span id="enlighten-styling">Enlighten Styling</span>
 
 Under Construction
 
-[Back To Menu](#maual)
+[Back To Menu](#manual)
