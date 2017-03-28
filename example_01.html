@@ -66,12 +66,13 @@
               name: 'question',
               placeholder: 'Input your question here ...',
               rows: 5
-            }
+            },
           ]
         },
+        
         cancelBtn: true,
       }).then(function(value) {
-        console.log('confirmed')
+        console.log(value)
       }).catch(function(value) {
         console.log('cancelled');
       });
@@ -80,7 +81,10 @@
 
     });
 
-    Enlighten('Hello')
+    Enlighten({
+      title: 'Test',
+      autoClose: 5,
+    })
   </script>
 </body>
 </html>

@@ -78,8 +78,12 @@
 
     /* Enlighten Constants */
     this.ID = _randomString(10);
-    this.enlighten = true;
-    
+    if (!this.content && !this.html && this.form) {
+      this.formFieldSelectors = {};
+      this.formData = {};
+      this.availableInputType = ['text', 'textarea', 'checkbox', 'radio', 'password', 'email', 'switch'];
+    }
+
     /* Input Validations */
     
     /* - Title property is globally required */
@@ -226,6 +230,17 @@
         };
         _enlightenBody.children.push(_enlightenHTMLContent);
       } else if (this.form) {
+        /* Get form fields */
+        for (var input of this.form.inputs) {
+          if (input.type === 'textarea') {
+            this.formFieldSelectors[input.name] = 'textarea[name="' + input.name + '"]';
+          } else if (['radio', 'checkbox', 'switch'].indexOf(input.type) !== -1) {
+            this.formFieldSelectors[input.name] = 'input[name="' + input.name + '"]:checked';
+          } else if (input.type === undefined || this.availableInputType.indexOf(input.type) !== -1) {
+            this.formFieldSelectors[input.name] = 'input[name="' + input.name + '"]';
+          }
+        }
+
         var _enlightenForm = {
           element: 'form',
           className: 'enlighten enlighten-form',
@@ -233,7 +248,7 @@
             method: _isString(this.form.method) ? this.form.method : 'post',
             action: _isString(this.form.action) ? this.form.action : '' ,
             name: _isString(this.form.name) ? this.form.name : '',
-            enctype: _isString(this.form.enctype) ? this.form.enctype : 'application/x-www-form-urlencoded'
+            // enctype: _isString(this.form.enctype) ? this.form.enctype : 'application/x-www-form-urlencoded'
           },
           children: _generateFormElements(this.form.inputs)
         };
@@ -329,7 +344,6 @@
         var _closeBtnEvent = function(event) {
           event.preventDefault();
           _removeNode($rootElement);
-          this.enlighten = false;
         };
         $closeBtnElement.addEventListener('click', _closeBtnEvent.bind(this));
       }
@@ -337,9 +351,8 @@
       /* Close Enlighten Box Outside */
       if ($rootElement && this.allowOutsideClick) {
         var _allowOutsideClickEvent = function(event) {
-          if (event.target.id === $rootElement.id && this.enlighten) {
+          if (event.target.id === $rootElement.id) {
             _removeNode($rootElement);
-            this.enlighten = false;
           }
         };
         $rootElement.addEventListener('click', _allowOutsideClickEvent.bind(this));
@@ -348,12 +361,22 @@
       /* Close Enlighten Box via Escape Key */
       if (this.allowEscapeKey) {
         var _allowEscapeKeyEvent = function(event) {
-          if (event.key === 'Escape' && $rootElement && this.enlighten) {
+          if (event.key === 'Escape' && $rootElement) {
             _removeNode($rootElement);
-            this.enlighten = false;
           }
         };
         document.body.addEventListener('keyup', _allowEscapeKeyEvent.bind(this));
+      }
+
+      /* Auto Closing the Enlighten Box */
+      if (!isNaN(this.autoClose)) {
+        setTimeout(function() {
+          try {
+            _removeNode($rootElement);
+          } catch(err) {
+            /* DO NOTHING */
+          }
+        }.bind(this), this.autoClose * 1000);
       }
     }.bind(this);
     
@@ -362,29 +385,41 @@
 
     /* Return Promise object when confirm or cancel button triggered in calling mode */
     if (this.confirmBtn || this.cancelBtn) {
-      /* Auto Closing the Enlighten Box */
-      if (!isNaN(this.autoClose)) {
-        setTimeout(function() {
-          if (this.enlighten) {
-            this.enlighten = false;
-            _removeNode($rootElement);
-          }
-        }.bind(this), this.autoClose);
-      }
-
       return new Promise(function(resolve, reject) {
         /* Confirm Button on Click Event */
-        if (this.confirmBtn && this.enlighten) {
+        if (this.confirmBtn) {
           var _confirmBtnOnClickEvent = function(event) {
             event.preventDefault();
-            _removeNode($rootElement);
-            resolve('confirmed');
+
+            /* When using form, it resolves an array of input */
+            if (!this.content && !this.html && this.form) {
+              var _formData = {};
+              var fields =  Object.keys(this.formFieldSelectors);
+
+              for (var field of fields) {
+                var _nodes = _queryNode(this.formFieldSelectors[field]);
+                if (_nodes.length === 1) {
+                  _formData[field] = _nodes[0].value;
+                } else {
+                  _formData[field] = [];
+                  _nodes.forEach(function(node) {
+                    _formData[field].push(node.value);
+                  });
+                }
+              }
+
+              resolve(_formData);
+              _removeNode($rootElement);
+            } else {
+              resolve('confirmed');
+              _removeNode($rootElement);
+            }
           }
           $confirmBtnElement.addEventListener('click', _confirmBtnOnClickEvent.bind(this));
         }
         
         /* Cancel Button on Click Event */
-        if (this.cancelBtn && this.enlighten) {
+        if (this.cancelBtn) {
           var _cancelBtnOnClickEvent = function(event) {
             event.preventDefault();
             _removeNode($rootElement);
