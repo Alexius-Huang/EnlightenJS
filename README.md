@@ -320,7 +320,7 @@ Enlighten({
 
 Now, assume the form has been filled like the image illustrated below, how will we know the user form input values? The answer is that the user input value will be converted into JSON format with key value pairs which key represents the field's `name` and the value is the user input. By utilizing `Promise` object which returned by Enlighten box, the value can be found in the `then` method which chained the Enlighten box.
 
-So, modify the Enlighten object and then console out the resolved value, we can get the user input :
+So, modify the Enlighten object and then console out the resolved value, we can get the user input (The first field of the input will be autofocused):
 
 ```js
 Enlighten({
@@ -375,29 +375,34 @@ var inputFieldObj = {
 There are other properties that can added to the input field object which is listed below:
 
 #### Text Field
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
 
 
 #### Email Field
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
 
 #### Password Field
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
 
 #### Checkbox Field
 *Hint: When using **multi-selection** fields, use this type of input field*
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the checkbox options  |
 
 #### Radio Field
 *Hint: When using **single selection** fields, use this type of input field*
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the radio options  |
