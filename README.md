@@ -409,6 +409,7 @@ There are other properties that can added to the input field object which is lis
 
 #### Switch Field
 *Hint: When using **boolean** type field, use this type of input field*
+
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `value` | `string` | `undefined` | A `string` value which represent the name and the value of the switch |
