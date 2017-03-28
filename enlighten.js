@@ -243,11 +243,12 @@
 
         var _enlightenForm = {
           element: 'form',
-          className: 'enlighten enlighten-form',
+          className: 'enlighten enlighten-form' + (_isString(this.form.className) ? (' ' + this.form.className) : ''),
           attributes: {
             method: _isString(this.form.method) ? this.form.method : 'post',
             action: _isString(this.form.action) ? this.form.action : '' ,
             name: _isString(this.form.name) ? this.form.name : '',
+            id: _isString(this.form.id) ? this.form.id : ('.enlighten-form-' + this.ID),
             // enctype: _isString(this.form.enctype) ? this.form.enctype : 'application/x-www-form-urlencoded'
           },
           children: _generateFormElements(this.form.inputs)

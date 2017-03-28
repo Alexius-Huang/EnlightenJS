@@ -14,14 +14,10 @@
 </head>
 <body>
   <button id="app">Click Me</button>
-  <script> 
-  /*Enlighten({
-    title: 'Hello World!',
-    content: 'You are using EnlightenJS!'
-  });*/
+  <script>
     document.getElementById('app').addEventListener('click', function(event){
       event.preventDefault();
-      Enlighten({
+      var  a = Enlighten({
         title: 'Hello World!',
         confirmBtn: true,
         //allowOutsideClick: false,
@@ -30,6 +26,7 @@
         //imageURL: 'https://www.w3schools.com/css/img_fjords.jpg',
         form: {
           action: 'hello.php', method: 'POST', name: 'my-form',
+          id: 'my-form', className: '123',
           inputs: [
             {
               labelName: 'Your Name',
@@ -73,6 +70,7 @@
         cancelBtn: true,
       }).then(function(value) {
         console.log(value)
+
       }).catch(function(value) {
         console.log('cancelled');
       });
@@ -80,11 +78,47 @@
       
 
     });
-
-    Enlighten({
-      title: 'Test',
-      autoClose: 5,
-    })
+var formObj = {
+  action: 'YOUR_ACTION.php',
+  method: 'post',
+  name: 'signup-form',
+  className: 'my-form',
+  id: 'my-signup-form',
+  inputs: [
+    {
+      type: 'text',
+      labelName: 'Username',
+      name: 'username',
+      placeholder: 'Enter your username here'
+    },
+    {
+      type: 'password',
+      labelName: 'Password',
+      name: 'password',
+      placeholder: 'Enter your password here'
+    },
+    {
+      type: 'radio',
+      labelName: 'Gender',
+      name: 'gender',
+      values: ['Male', 'Female']
+    },
+    {
+      type: 'switch',
+      labelName: 'Show your information in public?',
+      name: 'public',
+      value: 'public'
+    }
+  ]
+}
+Enlighten({
+  title: 'Sign Up',
+  confirmBtn: true,
+  closeBtn: false,
+  confirmBtnText: 'Submit',
+  allowOutsideClick: false,
+  form: formObj
+}).then(function(value) {console.log(value)});
   </script>
 </body>
 </html>

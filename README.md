@@ -153,7 +153,7 @@ Enlighten({
 
 Another awesome feature is to use the `form` property supported by EnlightenJS, it can automatically generate the HTML form from the value of the `form` property accordingly. <a href="#enlighten-form">Look for more information about Enlighten Form</a>.
 
-**Warning! This feature is currently under construction, thie image shows the prototype of the result, the feature may vary in nearly future.**
+**Warning! This feature is currently under construction, the image shows the prototype of the result, the feature may vary in nearly future.**
 
 ```js
 Enlighten({
@@ -195,9 +195,9 @@ There are three types of content can show in the Enlighten body part, which are 
 EnlightenJS will warn you in the console when you have two or all of them specified at the same time, just to mention that you can make your code simplified in Enlighten object.
 
 ### Styling Enlighten Box
-Enlighten provides several styling properties. The most basic one is the `width` property which can resize the width of the Enlighten box. Or you can use the `backgroundColor` property to specify the background color of the Enlighten box. <a href="#enlighten-styling">Look for more information about Enlighten Style properties</a>.
+Enlighten provides several styling properties. The most basic one is the `width` property which can resize the width of the Enlighten box. Or you can use the `backgroundColor` property to specify the background color of the Enlighten box. [Look for more information about Enlighten Style properties](#enlighten-styling).
 
-For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the <a href="#enlighten-structure">structure of the Enlighten box</a>, you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
+For own CSS customization purpose, you can access all of the Enlighten box elements using the `.enlighten` box. Knowing the [structure of the Enlighten box](#enlighten-structure), you can access different parts or components of the Enlighten according to the name of the structure, such as you can change the style of the body part using the class `.enlighten-body`. 
 
 [Back To Menu](#manual)
 
@@ -251,7 +251,95 @@ Enlighten({
 
 ## <span id="enlighten-form">Enlighten Form</span>
 
-Under Construction
+**Hint: This feature is currently developing ~**
+
+### Step to Step Basic Usage of `form` Property
+The `form` property provided EnlightenJS which can auto-generate form HTML elements need to give it an `Object` type value. Notice that when using this feature, you should not use the `content` or `html` property, they will override your form settings. Form object can assign basic properties such as the `action` and the `method` to perform, and you can also assign the `name`, `className` and the `id` of the form. So your base form object should become like this format :
+
+```js
+var formObj = {
+  // Maybe you are using PHP as back-end, for example.
+  action: 'YOUR_ACTION.php',
+  method: 'post',
+  name: 'signup-form',
+  className: 'my-form',
+  id: 'my-signup-form'
+};
+
+Enlighten({
+  title: 'Sign Up',
+  confirmBtn: true,
+  confirmBtnText: 'Submit',
+  closeBtn: false,
+  allowOutsideClick: false,
+  form: formObj
+});
+```
+
+Maybe you don't want user to escape from this form, so you can disable the `closeBtn` and `allowOutsideClick` properties with the `false` value. (Default of `cancelBtn` is `false`, so we don't need to add that property).
+
+Now, we need to add form input fields. Its simple, add the `inputs` property with array type value to the form object, and then specify each field as an object and put it into the `inputs` property array, for instance :
+
+```js
+var formObj = {
+  ...,
+  inputs: [
+    {
+      type: 'text',
+      labelName: 'Username',
+      name: 'username',
+      placeholder: 'Enter your username here'
+    },
+    {
+      type: 'password',
+      labelName: 'Password',
+      name: 'password',
+      placeholder: 'Enter your password here'
+    },
+    {
+      type: 'radio',
+      labelName: 'Gender',
+      name: 'gender',
+      values: ['Male', 'Female']
+    },
+    {
+      type: 'switch',
+      labelName: 'Show your information in public?',
+      name: 'public',
+      value: 'public'
+    }
+  ]
+}
+
+Enlighten({
+  ...
+});
+```
+
+<img src="./img/enlighten_form_01.png" />
+
+Now, assume the form has been filled like the image illustrated below, how will we know the user form input values? The answer is that the user input value will be converted into JSON format with key value pairs which key represents the field's `name` and the value is the user input. By utilizing `Promise` object which returned by Enlighten box, the value can be found in the `then` method which chained the Enlighten box.
+
+So, modify the Enlighten object and then console out the resolved value, we can get the user input :
+
+```js
+Enlighten({
+  title: 'Sign Up',
+  confirmBtn: true,
+  confirmBtnText: 'Submit',
+  closeBtn: false,
+  allowOutsideClick: false,
+  form: formObj
+}).then(inputJSON){
+  console.log(inputJSON);
+};
+```
+
+<img src="./img/enlighten_form_02.png" />
+
+The printed input in console when form submitted:
+
+<img src="./img/enlighten_form_03.png" />
 
 [Back To Menu](#manual)
 
