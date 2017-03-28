@@ -341,6 +341,73 @@ The printed input in console when form submitted:
 
 <img src="./img/enlighten_form_03.png" />
 
+Below there are other sub-topics about form, such as form object properties, form input field object formatting and other.
+
+### Form Object Properties
+
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `action` | `string` | `undefined` | Action of the form, it is not required to specified |
+| `method` | `string` | `post` | Method of the form, default method is `post` |
+| `name` | `string` | `""` | Name of the form |
+| `className` | `string` | `undefined` | Class name of the form, if specified it will append the class to default class provided by EnlightenJS ( which is `.enlighten .enlighten-form` ) |
+| `id` | `string` | `undefined` | ID of the form |
+| `inputs` | `array`| `undefined` | Required property, it specifies the inputs of the form which the array value should contain **input field object(s)** |
+
+### Form Input Field Object Format
+
+Every input field object should specify `type` property which represent the type of the input. EnlightenJS provided six type of input, which are `text`, `email`, `password`, `checkbox`, `radio` and `switch`. (There will be more type supported in future.)
+
+Default field type is `text`, so if you didn't specify the `type` property, Enlighten form will viewed the input field object as a kind of `text` input. However, if the input type doesn't match the provided type, it will ignore that input field object and console out errors to remind you.
+
+Another common property is the `name` and the `labelName` of the input field. When sending data with JSON format object, the `name` of the field represents the key of the key-value pair in JSON form data. The `labelName`, namely, the label name which can show on the form.
+
+So an input field object should at least look like this :
+
+```js
+var inputFieldObj = {
+  type: 'text' | 'email' | 'password' | 'checkbox' | 'radio' | 'switch',
+  name: 'username',
+  labelName: 'Username'
+}
+```
+
+There are other properties that can added to the input field object which is listed below:
+
+#### Text Field
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+
+
+#### Email Field
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+
+#### Password Field
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+
+#### Checkbox Field
+*Hint: When using **multi-selection** fields, use this type of input field*
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the checkbox options  |
+
+#### Radio Field
+*Hint: When using **single selection** fields, use this type of input field*
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the radio options  |
+
+#### Switch Field
+*Hint: When using **boolean** type field, use this type of input field*
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `value` | `string` | `undefined` | A `string` value which represent the name and the value of the switch |
+
 [Back To Menu](#manual)
 
 ## <span id="enlighten-styling">Enlighten Styling</span>

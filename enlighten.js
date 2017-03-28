@@ -399,12 +399,14 @@
 
               for (var field of fields) {
                 var _nodes = _queryNode(this.formFieldSelectors[field]);
-                if (_nodes.length === 1) {
-                  _formData[field] = _nodes[0].value;
+                if (_nodes.length === 0) {
+                  _formData[field] = null;
+                } else if (_nodes.length === 1) {
+                  _formData[field] = _nodes[0].value ? _nodes[0].value : null;
                 } else {
                   _formData[field] = [];
                   _nodes.forEach(function(node) {
-                    _formData[field].push(node.value);
+                    _formData[field].push(node.value ? node.value : null);
                   });
                 }
               }
