@@ -36,7 +36,7 @@
                                           -> String::value
                                           -> String::placeholder
       Input types planned to support :
-        text | textarea | email | password | checkbox | radio
+        text | textarea | email | password | checkbox | radio | switch
     */
 
     // Footer Part
@@ -47,6 +47,8 @@
     this.cancelBtnText  = _isString(argv.cancelBtnText)   ? argv.cancelBtnText  : 'Cancel';
     this.confirmed      = _isFunction(argv.confirmed)     ? argv.confirmed      : false;
     this.cancelled      = _isFunction(argv.cancelled)     ? argv.cancelled      : false;
+    this.confirmedValue = argv.confirmedValue;
+    this.cancelledValue = argv.cancelledValue;
 
     this.autoClose         = _isNumber(argv.autoClose)          ? argv.autoClose         : NaN;
     this.allowOutsideClick = _isBoolean(argv.allowOutsideClick) ? argv.allowOutsideClick : true;
@@ -78,13 +80,22 @@
 
     /* Enlighten Constants */
     this.ID = _randomString(10);
+
+    /* Enlighten Form Parameters */
     if (!this.content && !this.html && this.form) {
       this.formFieldSelectors = {};
       this.formData = {};
       this.availableInputType = ['text', 'textarea', 'checkbox', 'radio', 'password', 'email', 'switch'];
+      this.validationReference = {
+        text:     ['expect', 'required', 'max_length', 'min_length', 'match'],
+        textarea: ['expect', 'required', 'max_length', 'min_length', 'match'],
+        email:    ['expect', 'required', 'match_email'],
+        password: ['expect', 'required', 'max_length', 'min_length', 'match'],
+        checkbox: ['expect', 'required', 'max_choice', 'min_choice'],
+        radio:    ['expect', 'required'],
+        switch:   ['expect'] // No need to required because it is assigned either true or false
+      };
     }
-
-    /* Input Validations */
     
     /* - Title property is globally required */
     if (argv.title  === undefined) { console.error('"title" property is required');  return; }
@@ -234,9 +245,9 @@
         for (var input of this.form.inputs) {
           if (input.type === 'textarea') {
             this.formFieldSelectors[input.name] = 'textarea[name="' + input.name + '"]';
-          } else if (['radio', 'checkbox', 'switch'].indexOf(input.type) !== -1) {
+          } else if (_include(['radio', 'checkbox', 'switch'], input.type)) {
             this.formFieldSelectors[input.name] = 'input[name="' + input.name + '"]:checked';
-          } else if (input.type === undefined || this.availableInputType.indexOf(input.type) !== -1) {
+          } else if (input.type === undefined || _include(this.availableInputType, input.type)) {
             this.formFieldSelectors[input.name] = 'input[name="' + input.name + '"]';
           }
         }
@@ -352,9 +363,7 @@
       /* Close Enlighten Box Outside */
       if ($rootElement && this.allowOutsideClick) {
         var _allowOutsideClickEvent = function(event) {
-          if (event.target.id === $rootElement.id) {
-            _removeNode($rootElement);
-          }
+          event.target.id === $rootElement.id && _removeNode($rootElement);
         };
         $rootElement.addEventListener('click', _allowOutsideClickEvent.bind(this));
       }
@@ -363,7 +372,9 @@
       if (this.allowEscapeKey) {
         var _allowEscapeKeyEvent = function(event) {
           if (event.key === 'Escape' && $rootElement) {
-            _removeNode($rootElement);
+            try {
+              _removeNode($rootElement);
+            } catch(err) { /* DO NOTHING */ }
           }
         };
         document.body.addEventListener('keyup', _allowEscapeKeyEvent.bind(this));
@@ -374,9 +385,7 @@
         setTimeout(function() {
           try {
             _removeNode($rootElement);
-          } catch(err) {
-            /* DO NOTHING */
-          }
+          } catch(err) { /* DO NOTHING */ }
         }.bind(this), this.autoClose * 1000);
       }
     }.bind(this);
@@ -394,27 +403,12 @@
 
             /* When using form, it resolves an array of input */
             if (!this.content && !this.html && this.form) {
-              var _formData = {};
-              var fields =  Object.keys(this.formFieldSelectors);
-
-              for (var field of fields) {
-                var _nodes = _queryNode(this.formFieldSelectors[field]);
-                if (_nodes.length === 0) {
-                  _formData[field] = null;
-                } else if (_nodes.length === 1) {
-                  _formData[field] = _nodes[0].value ? _nodes[0].value : null;
-                } else {
-                  _formData[field] = [];
-                  _nodes.forEach(function(node) {
-                    _formData[field].push(node.value ? node.value : null);
-                  });
-                }
-              }
-
-              resolve(_formData);
+              var _formData = _collectFormData(this.form.inputs, this.formFieldSelectors);
+              var _errorResult = _validateFormData(_formData, this.form.inputs, this.validationReference);
+              Object.keys(_errorResult).length != 0 ? reject(_errorResult) : resolve(_formData);
               _removeNode($rootElement);
             } else {
-              resolve('confirmed');
+              resolve(this.confirmedValue);
               _removeNode($rootElement);
             }
           }
@@ -426,7 +420,7 @@
           var _cancelBtnOnClickEvent = function(event) {
             event.preventDefault();
             _removeNode($rootElement);
-            reject('rejected');
+            reject(this.cancelledValue);
           }
           $cancelBtnElement.addEventListener('click', _cancelBtnOnClickEvent.bind(this));
         }
@@ -440,9 +434,10 @@
   function _isNumber(variable)   { return typeof variable === 'number';   }
   function _isBoolean(variable)  { return typeof variable === 'boolean';  }
   function _isObject(variable)   { return typeof variable === 'object';   }
-  function _isArray(variable)    { return (variable) instanceof Array;    }
   function _isFunction(variable) { return typeof variable === 'function'; }
-
+  function _isArray(variable)    { return (variable) instanceof Array;    }
+  function _isRegExp(variable)   { return (variable) instanceof RegExp;   }
+  
   function _jsonToHTML(json) {
     var wrapper = document.createElement(json.element);
     if (json.className) wrapper.className = json.className;
@@ -504,9 +499,15 @@
     return result;
   }
 
-  function _removeNode(node) { if (node && node instanceof Node) node.parentElement.removeChild(node); }
+  function _removeNode(node) { node && node instanceof Node && node.parentElement.removeChild(node); }
   function _displayNode(node, mode) { if (node && node instanceof Node) node.style.display = mode; }
   function _queryNode(selector) { return document.querySelectorAll(selector); }
+
+  function _include(array, item) { return array.indexOf(item) !== -1; }
+  function _where(arrayOfObjects, key, value) {
+    result = arrayOfObjects.filter(function(item) { return item[key] === value; });
+    if (result.length === 1) { return result[0]; } else return result;
+  }
 
   function _generateFormElements(inputArray) {
     var _jsonArray = [];
@@ -530,8 +531,8 @@
         className: 'enlighten enlighten-input',
         attributes: {
           name: input.name,
-          value: input.value ? input.value : '',
-          type: input.type ? input.type : 'text',
+          value: input.value || '',
+          type: input.type || 'text',
           autofocus: _inputCount === 1
         }
       }
@@ -591,7 +592,7 @@
                   attributes: {
                     type: input.type,
                     name: input.name,
-                    value: value,
+                    value: value || "",
                     id: 'enlighten-' + input.type + '-' + value
                   }
                 };
@@ -621,13 +622,71 @@
         _labelElement.children.push(_inputElement);
         
         /* When type is switch then push in the switch style elements */
-        if (input.type === 'switch') { _labelElement.children.push(_switchElement); }
+        input.type === 'switch' && _labelElement.children.push(_switchElement);
         
         _jsonArray.push(_labelElement);
       }
     }
 
     return _jsonArray;
+  }
+
+  function _collectFormData(formInputs, formFieldSelectors) {
+    var _formData = {};
+    for (var inputInfo of formInputs) {
+      var fieldName = inputInfo.name;
+      var _nodes = _queryNode(formFieldSelectors[fieldName]);
+      if (_nodes.length === 0) {
+        _formData[fieldName] = null;
+      } else if (_nodes.length === 1) {
+        _formData[fieldName] = _nodes[0].value ? _nodes[0].value : null;
+      } else {
+        _formData[fieldName] = [];
+        _nodes.forEach(function(node) {
+          _formData[fieldName].push(node.value ? node.value : null);
+        });
+      }
+    }
+    return _formData;
+  }
+
+  function _validateFormData(formData, formInputs, validationReference) {
+    var _errorResult = {};
+    for (var inputInfo of formInputs) {
+      var fieldName = inputInfo.name;
+      var errorObj = {};
+      var value = formData[fieldName];
+      var EMAIL_REGEX = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
+      for (var validationType of validationReference[inputInfo.type || 'text']) {
+        if (inputInfo.hasOwnProperty(validationType)) {
+          var errorMessage = _validate(validationType, inputInfo[validationType], fieldName, value);
+          if (errorMessage) errorObj[validationType] = errorMessage;
+        }
+      }
+      
+      /* Eamil type of input should also validate its format */
+      if (inputInfo.type === 'email') {
+        var errorMessage = _validate('match_email', EMAIL_REGEX, fieldName, value);
+        if (errorMessage) errorObj.match_email = errorMessage;
+      }
+
+      if (Object.keys(errorObj).length != 0) { _errorResult[fieldName] = errorObj; }
+    }
+    return _errorResult;
+  }
+
+  function _validate(type, validationParam, fieldName, value) {
+    switch(type) {
+      case 'expect':      return String(validationParam) !== value && '"' + fieldName + '" is expect to be "' + String(validationParam) + '"' || false;
+      case 'required':    return _isBoolean(validationParam) && validationParam && !value && '"' + fieldName + '" field is required' || false;
+      case 'max_length':  return _isNumber(validationParam) && value && value.length > validationParam && '"' + fieldName + '" field exceeds the maximum length ' + validationParam || false;
+      case 'min_length':  return (!value || _isNumber(validationParam) && value.length < validationParam) && '"' + fieldName + '" field is shorter than minimum length ' + validationParam || false;
+      case 'match':       return _isRegExp(validationParam) && !validationParam.test(value) && '"' + fieldName + '" field didn\'t match the RegExp ' + validationParam || false;
+      case 'match_email': return !validationParam.test(value) && '"' + fieldName + '" is not an email format' || false;
+      case 'max_choice':  return (!value || _isNumber(validationParam) && _isArray(value) && value.length > validationParam) && '"' + fieldName + '" field must select at most ' + validationParam + ' choice(s)' || false;
+      case 'min_choice':  return _isNumber(validationParam) && _isArray(value) && value.length < validationParam && '"' + fieldName + '" field must select at least ' + validationParam + ' choice(s)' || false;
+    }
   }
 
 })();

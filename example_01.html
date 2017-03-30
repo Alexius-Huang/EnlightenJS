@@ -89,7 +89,17 @@ var formObj = {
       type: 'text',
       labelName: 'Username',
       name: 'username',
-      placeholder: 'Enter your username here'
+      placeholder: 'Enter your username here',
+      required: true,
+      min_length: 3,
+      max_length: 10,
+      min_choice: 1,
+      match: /\abc/
+    },
+    {
+      type: 'email',
+      labelName: 'Email',
+      name: 'email'
     },
     {
       type: 'password',
@@ -107,7 +117,15 @@ var formObj = {
       type: 'switch',
       labelName: 'Show your information in public?',
       name: 'public',
-      value: 'public'
+      value: 'public',
+    },
+    {
+      type: 'checkbox',
+      labelName: 'Hello',
+      name: 'hello',
+      values: ['hello', 'hi', 'howareyou', 'finde'],
+      min_choice: 1,
+      max_choice: 3,
     }
   ]
 }
@@ -118,7 +136,12 @@ Enlighten({
   confirmBtnText: 'Submit',
   allowOutsideClick: false,
   form: formObj
-}).then(function(value) {console.log(value)});
+}).then(function(value) {
+  console.log(value)
+}).catch(function(here) {
+  console.log('here', here);
+});
+
   </script>
 </body>
 </html>
