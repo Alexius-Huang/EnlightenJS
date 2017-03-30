@@ -353,6 +353,7 @@ Below there are other sub-topics about form, such as form object properties, for
 | `className` | `string` | `undefined` | Class name of the form, if specified it will append the class to default class provided by EnlightenJS ( which is `.enlighten .enlighten-form` ) |
 | `id` | `string` | `undefined` | ID of the form |
 | `inputs` | `array`| `undefined` | Required property, it specifies the inputs of the form which the array value should contain **input field object(s)** |
+| `submit` | `boolean`| `undefined` | When set to `true`, it will automatically submit the form directly and skips the actions such as the `Promise` and validations |
 
 ### Form Input Field Object Format
 
@@ -379,19 +380,42 @@ There are other properties that can added to the input field object which is lis
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `expect` | `string` | `undefined` | Validate the input is expect to equal to the value of the property |
+| `match` | `regexp` | `undefined` | Validate the input value should match the format specified by the property |
+| `min_length` | `number` | `undefined` | Validate the input value length must be longer than the value of the property |
+| `max_length` | `number` | `undefined` | Validate the input value length must not exceeds the value of the property |
 
-
-#### Email Field
+#### Textarea Field
 
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+| `rows` | `number` | `2` | The rows of the textarea field |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `expect` | `string` | `undefined` | Validate the input is expect to equal to the value of the property |
+| `match` | `regexp` | `undefined` | Validate the input value should match the format specified by the property |
+| `min_length` | `number` | `undefined` | Validate the input value length must be longer than the value of the property |
+| `max_length` | `number` | `undefined` | Validate the input value length must not exceeds the value of the property |
+
+#### Email Field
+**Hint** : When using the email field, it will automatically validates the email format with `match_email` property. If not passed, the resulted error object will also have the `match_email` property include
+| Property | Type | Default | Description |
+|:--------:|:----:|:-------:|:------------|
+| `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `expect` | `string` | `undefined` | Validate the input is expect to equal to the value of the property |
+| `match` | `regexp` | `undefined` | Validate the input value should match the format specified by the property |
 
 #### Password Field
 
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `placeholder` | `string` | `undefined` | The placeholder string will display in the input field when there is no user input value |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `match` | `regexp` | `undefined` | Validate the input value should match the format specified by the property |
+| `min_length` | `number` | `undefined` | Validate the input value length must be longer than the value of the property |
+| `max_length` | `number` | `undefined` | Validate the input value length must not exceeds the value of the property |
 
 #### Checkbox Field
 *Hint: When using **multi-selection** fields, use this type of input field*
@@ -399,6 +423,9 @@ There are other properties that can added to the input field object which is lis
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the checkbox options  |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `min_choice` | `number` | `undefined` | Validate the checked value count must be over than the value of the property |
+| `max_choice` | `number` | `undefined` | Validate the checked value count must not exceed the value of the property |
 
 #### Radio Field
 *Hint: When using **single selection** fields, use this type of input field*
@@ -406,13 +433,16 @@ There are other properties that can added to the input field object which is lis
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `values` | `array` | `undefined` | Array of `string` type values which represent the name and the value of the radio options  |
+| `required` | `boolean` | `undefined` | Validate the input is required |
+| `expect` | `string` | `undefined` | Validate the input is expect to equal to the value of the property |
 
 #### Switch Field
 *Hint: When using **boolean** type field, use this type of input field*
-
 | Property | Type | Default | Description |
 |:--------:|:----:|:-------:|:------------|
 | `value` | `string` | `undefined` | A `string` value which represent the name and the value of the switch |
+| `expect` | `string` | `undefined` | Validate the input is expect to equal to the value of the property |
+
 
 [Back To Menu](#manual)
 

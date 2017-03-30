@@ -89,9 +89,9 @@
       this.validationReference = {
         text:     ['expect', 'required', 'max_length', 'min_length', 'match'],
         textarea: ['expect', 'required', 'max_length', 'min_length', 'match'],
-        email:    ['expect', 'required', 'match_email'],
-        password: ['expect', 'required', 'max_length', 'min_length', 'match'],
-        checkbox: ['expect', 'required', 'max_choice', 'min_choice'],
+        email:    ['expect', 'required', 'match', 'match_email'],
+        password: ['required', 'max_length', 'min_length', 'match'],
+        checkbox: ['required', 'max_choice', 'min_choice'],
         radio:    ['expect', 'required'],
         switch:   ['expect'] // No need to required because it is assigned either true or false
       };
@@ -403,13 +403,16 @@
 
             /* When using form, it resolves an array of input */
             if (!this.content && !this.html && this.form) {
+              /* Submit directly when specified "submit" property in form object */
+              this.form.submit && document.getElementById(this.form.id).submit();
+
               var _formData = _collectFormData(this.form.inputs, this.formFieldSelectors);
               var _errorResult = _validateFormData(_formData, this.form.inputs, this.validationReference);
+              _removeNode($rootElement);
               Object.keys(_errorResult).length != 0 ? reject(_errorResult) : resolve(_formData);
-              _removeNode($rootElement);
             } else {
-              resolve(this.confirmedValue);
               _removeNode($rootElement);
+              resolve(this.confirmedValue);
             }
           }
           $confirmBtnElement.addEventListener('click', _confirmBtnOnClickEvent.bind(this));
