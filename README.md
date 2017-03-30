@@ -399,7 +399,8 @@ There are other properties that can added to the input field object which is lis
 | `max_length` | `number` | Validate the input value length must not exceeds the value of the property |
 
 #### Email Field
-**Hint** : When using the email field, it will automatically validates the email format with `match_email` property. If not passed, the resulted error object will also have the `match_email` property include
+**Hint** : When using the email field, it will automatically validates the email format with `match_email` property. If not passed, the resulted error object will also have the `match_email` property included
+
 | Property | Type | Description |
 |:--------:|:----:|:------------|
 | `placeholder` | `string` | The placeholder string will display in the input field when there is no user input value |
@@ -438,6 +439,7 @@ There are other properties that can added to the input field object which is lis
 
 #### Switch Field
 *Hint: When using **boolean** type field, use this type of input field*
+
 | Property | Type | Description |
 |:--------:|:----:|:------------|
 | `value` | `string` | A `string` value which represent the name and the value of the switch |
